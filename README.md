@@ -11,6 +11,8 @@ npm i yoyoo-ddr --save
 ```javascript
 
 import DDR from 'yoyoo-ddr'
+import 'yoyoo-ddr/dist/yoyoo-ddr.css'
+
 export default {
     data(){
         return {
