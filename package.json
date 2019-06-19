@@ -3,11 +3,13 @@
   "version":"0.1.24",
   "description":"vue-draggable-resizable-rotatable",
   "private":false,
+  "main":"dist/yoyoo-ddr.umd.min.js",
+  "keyword":"draggable resizable rotatable vue-ddr",
   "scripts":{
     "serve":"vue-cli-service serve",
     "build":"vue-cli-service build",
     "lint":"vue-cli-service lint",
-    "lib":"vue-cli-service build --target lib --name yoyoo-ddr --dest lib libs/yoyoo-ddr/index.js"
+    "lib":"vue-cli-service build --target lib --name yoyoo-ddr --dest dist libs/yoyoo-ddr/index.js"
   },
   "dependencies":{
     "core-js":"^2.6.5",
