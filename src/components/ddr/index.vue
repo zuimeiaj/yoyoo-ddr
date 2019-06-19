@@ -44,7 +44,7 @@
                 type : Boolean
             },
             rotatable : {
-                default : false,
+                default : true,
                 type : Boolean
             },
             draggable : {
@@ -57,11 +57,11 @@
             },
             minWidth : {
                 type : Number,
-                default : 0
+                default : 1
             },
             minHeight : {
                 type : Number,
-                default : 0
+                default : 1
             }
         },
         data(){

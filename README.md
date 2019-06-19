@@ -49,6 +49,7 @@ value | Object | {x:0,y:0,width:100,height:100,rotation:0} | Controls the positi
 
 ### Events
 The parameter event is the component's native event object
+
 The parameter transform is the position and rotation angle of the component
 
 name | args
