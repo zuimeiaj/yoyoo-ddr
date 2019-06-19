@@ -25,8 +25,9 @@
                 </DDR>
             </div>
             <footer class="footer">
-                <a href="https://app.yoyoo.ink">YOYOO原型设计 - 一个在线高保真原型设计工具 </a>
-                <a href="https://www.fechat.ink">FE社区 - 一个基于JavaScript的垂直化前端技术社区</a>
+                <a target="_blank" href="https://app.yoyoo.ink">YOYOO原型设计 - 一个在线高保真原型设计工具 </a>
+                <a target="_blank" href="https://www.fechat.ink">FE社区 - 一个基于JavaScript的垂直化前端技术社区</a>
+                <a target="_blank" href="https://github.com/zuimeiaj/yoyoo-ddr">Github</a>
             </footer>
         </div>
         <div class="inspector">

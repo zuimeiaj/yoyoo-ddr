@@ -4,5 +4,6 @@ module.exports = {
             options.fix = true
             return options
         })
-    }
+    },
+    baseUrl : '/ddr'
 }
