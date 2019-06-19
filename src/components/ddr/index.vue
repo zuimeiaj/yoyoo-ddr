@@ -2,6 +2,7 @@
     <div ref="wrapper"
          :style="style"
          :class="{active:active}"
+         @touchstart="handleMouseDown"
          @mousedown="handleMouseDown" class="yoyoo-ddr">
         <slot></slot>
         <div v-if="resizable">
@@ -93,11 +94,14 @@
             },
             handleMouseDown(event){
                 if(!this.active) return
-                let {clientX, clientY} = event
+                let point = event.touches ? event.touches[0] : event
+                let {clientX, clientY} = point
                 this._lastX = clientX
                 this._lastY = clientY
                 this._activeTarget = event.target
                 document.addEventListener('mousemove', this.handleMouseMove, false)
+                document.addEventListener('touchmove', this.handleMouseMove, false)
+                document.addEventListener('touchend', this.handleMouseUp, false)
                 document.addEventListener('mouseup', this.handleMouseUp, false)
                 if(event.target.dataset.type === 'rotate') {
                     this._handlerType = 'rotate'
@@ -118,13 +122,13 @@
                     this.handleResizeMove(event)
                     this.$emit('resize', event, this.transform)
                 } else if(this._handlerType === 'drag' && this.draggable) {
-                    let {clientX, clientY} = event
+                    let {clientX, clientY} = event.touches ? event.touches[0] : event
                     let deltaX = clientX - this._lastX
                     let deltaY = clientY - this._lastY
                     this._lastX = clientX
                     this._lastY = clientY
-                    this.transform.x += deltaX
-                    this.transform.y += deltaY
+                    this.transform.x = Math.round(this.transform.x + deltaX)
+                    this.transform.y = Math.round(this.transform.y + deltaY)
                     this.$emit('drag', event, this.transform)
                 } else if(this._handlerType === 'rotate') {
                     this.handleRotateMove(event)
@@ -134,6 +138,8 @@
             handleMouseUp(event){
                 document.removeEventListener('mousemove', this.handleMouseMove, false)
                 document.removeEventListener('mouseup', this.handleMouseUp, false)
+                document.removeEventListener('touchmove', this.handleMouseMove, false)
+                document.removeEventListener('touchend', this.handleMouseUp, false)
                 let ev = {
                     drag : 'draggable',
                     resize : 'resizable',
@@ -147,7 +153,7 @@
                 let matrix = getPoints(rect)
                 let pressAngle
                 let opposite = matrix[pointMap[type]]
-                let {clientX, clientY} = event
+                let {clientX, clientY} = event.touches ? event.touches[0] : event
                 let x1 = clientX - this._parentRect.left - opposite.x
                 let y1 = clientY - this._parentRect.top - opposite.y
                 let _width = rect.width, _height = rect.height
@@ -165,7 +171,7 @@
                 }
             },
             handleResizeMove(event){
-                let {clientX, clientY} = event
+                let {clientX, clientY} = event.touches ? event.touches[0] : event
                 let {opposite, currentRatio, type, pressAngle, startAngle} = this._resizeOpt
                 let x = clientX - this._parentRect.left - opposite.x,
                     y = clientY - this._parentRect.top - opposite.y,
@@ -199,23 +205,25 @@
                 this.transform = transform
             },
             handleRotateStart(event){
+                let {clientX, clientY} = event.touches ? event.touches[0] : event
                 let t = this.$refs.wrapper.getBoundingClientRect(),
                     cx = t.left + t.width / 2,
                     cy = t.top + t.height / 2,
-                    startAngle = 180 / Math.PI * Math.atan2(event.clientY - cy, event.clientX - cx),
+                    startAngle = 180 / Math.PI * Math.atan2(clientY - cy, clientX - cx),
                     rotation = this.transform.rotation
                 this._rotateOpt = {cx, cy, startAngle, rotation}
             },
             handleRotateMove(event){
                 let {cx, cy, startAngle, rotation} = this._rotateOpt
-                let x = event.clientX - cx,
-                    y = event.clientY - cy,
+                let {clientX, clientY} = event.touches ? event.touches[0] : event
+                let x = clientX - cx,
+                    y = clientY - cy,
                     angle = 180 / Math.PI * Math.atan2(y, x),
                     currentAngle = angle - startAngle,
                     r = rotation + currentAngle
                 r = r % 360
                 r = r < 0 ? r + 360 : r
-                this.transform.rotation = Math.round(r)
+                this.transform.rotation = Math.floor(r)
             }
         }
     }
@@ -244,8 +252,8 @@
     .resize-handler,
     .rotate-handler {
         position: absolute;
-        width: 9px;
-        height: 9px;
+        width: 13px;
+        height: 13px;
         border: 1px solid #607d8b;
         background: #fff;
         box-sizing: border-box;
@@ -253,53 +261,53 @@
     }
 
     .resize-handler.tl {
-        left: -4px;
-        top: -4px;
+        left: -6px;
+        top: -6px;
     }
 
     .resize-handler.tm {
         left: 50%;
-        top: -4px;
-        margin-left: -4px;
+        top: -6px;
+        margin-left: -6px;
     }
 
     .resize-handler.tr {
-        right: -4px;
-        top: -4px;
+        right: -6px;
+        top: -6px;
     }
 
     .resize-handler.r {
-        right: -4px;
+        right: -6px;
         top: 50%;
-        margin-top: -4px;
+        margin-top: -6px;
     }
 
     .resize-handler.br {
-        bottom: -4px;
-        right: -4px;
+        bottom: -6px;
+        right: -6px;
     }
 
     .resize-handler.bm {
         left: 50%;
-        margin-left: -4px;
-        bottom: -4px;
+        margin-left: -6px;
+        bottom: -6px;
     }
 
     .resize-handler.bl {
-        left: -4px;
-        bottom: -4px;
+        left: -6px;
+        bottom: -6px;
     }
 
     .resize-handler.l {
         top: 50%;
-        margin-top: -4px;
-        left: -4px;
+        margin-top: -6px;
+        left: -6px;
         cursor: pointer;
     }
 
     .rotate-handler {
         top: -25px;
-        margin-left: -4px;
+        margin-left: -6px;
         left: 50%;
         cursor: crosshair;
     }
@@ -311,7 +319,7 @@
         height: 17px;
         background: #607d8b;
         top: 7px;
-        left: 3px;
+        left: 5px;
         z-index: -1;
     }
 

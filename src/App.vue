@@ -1,7 +1,8 @@
 <template>
     <div id="app">
         <div class="columns">
-            <h1 class="header">YOYOO - DDR</h1>
+            <h1 class="header">yoyoo - ddr
+            Mobile & PC</h1>
             <div class="content">
                 <DDR :draggable="controlled.draggable"
                      :rotatable="controlled.rotatable"
@@ -33,11 +34,11 @@
         <div class="inspector">
             <div class="input-item" :key="item.name" v-for="item in inputs">
                 <label class="input-label">{{item.name}}</label>
-                <input :type="item.type" v-model="controlled[item.name]"/>
+                <input class="input-value" :type="item.type" v-model="controlled[item.name]"/>
             </div>
             <div class="input-item">
                 <label class="input-label">events</label>
-                <span>{{events}}</span>
+                <span class="input-value">{{events}}</span>
             </div>
         </div>
     </div>
@@ -67,10 +68,10 @@
                     {type : 'checkbox', name : 'active'},
                 ],
                 controlled : {
-                    x : 200,
-                    y : 200,
-                    width : 200,
-                    height : 200,
+                    x : 30,
+                    y : 30,
+                    width : 100,
+                    height : 100,
                     rotation : 0,
                     minHeight : 10,
                     minWidth : 10,
@@ -142,6 +143,7 @@
     * {
         margin: 0;
         padding: 0;
+        box-sizing: border-box;
     }
 
     #app {
@@ -164,11 +166,15 @@
         height: 60px;
         line-height: 60px;
         padding-left: 25px;
+        font-size: 14px;
+        font-weight: 400;
+        color: #333;
     }
 
     .columns .content {
         flex: 1;
         position: relative;
+        overflow: hidden;
     }
 
     .cell {
@@ -196,6 +202,11 @@
     }
 
     .input-label {
+        flex: 1;
+    }
+
+    .input-value {
+        display: inline-block;
         width: 120px;
     }
 
@@ -209,5 +220,32 @@
         margin-right: 20px;
         color: #989898;
         text-decoration: none;
+    }
+
+    @media screen and (max-width: 600px) {
+        .footer a {
+            color: #989898;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+
+        }
+
+        .inspector {
+            width: 140px;
+        }
+
+        .input-item {
+            padding: 0 5px;
+        }
+
+        .input-label {
+            font-size: 10px;
+        }
+
+        .input-value {
+            font-size: 10px;
+            width: 70px;
+        }
     }
 </style>
