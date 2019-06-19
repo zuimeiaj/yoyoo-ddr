@@ -3,5 +3,6 @@ node_modules/
 public/
 src/
 .gitignore
+.idea/
 babel.config.js
 vue.config.js
