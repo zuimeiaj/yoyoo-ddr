@@ -1,0 +1,7 @@
+libs/
+node_modules/
+public/
+src/
+.gitignore
+babel.config.js
+vue.config.js
