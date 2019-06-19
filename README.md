@@ -19,7 +19,7 @@ export default {
     },
     render(){
         return (
-            <DDR :value={this.transform}>
+            <DDR value={this.transform}>
                 <div style="width:100%;height:100%;background:red"></div>
             </DDR>
         )
