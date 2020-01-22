@@ -1,55 +1,55 @@
 {
-  "name":"yoyoo-ddr",
-  "version":"0.1.28",
-  "description":"A vue component that can be rotated and resized",
-  "private":false,
-  "main":"dist/yoyoo-ddr.umd.min.js",
-  "keyword":"draggable resizable rotatable vue-ddr",
-  "scripts":{
-    "serve":"vue-cli-service serve",
-    "build":"vue-cli-service build --dest ddr",
-    "lint":"vue-cli-service lint",
-    "lib":"vue-cli-service build --target lib --name yoyoo-ddr --dest dist libs/yoyoo-ddr/index.js"
+  "name": "yoyoo-ddr",
+  "version": "0.2",
+  "description": "A vue component that can be rotated and resized",
+  "private": false,
+  "main": "dist/yoyoo-ddr.umd.min.js",
+  "keyword": "draggable resizable rotatable vue-ddr",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build --dest ddr",
+    "lint": "vue-cli-service lint",
+    "lib": "vue-cli-service build --target lib --name yoyoo-ddr --dest dist libs/yoyoo-ddr/index.js"
   },
-  "dependencies":{
-    "core-js":"^2.6.5",
-    "vue":"^2.6.10"
+  "dependencies": {
+    "core-js": "^2.6.5",
+    "vue": "^2.6.10"
   },
-  "repository":{
-    "type":"git",
-    "url":"git+https://github.com/zuimeiaj/yoyoo-ddr"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zuimeiaj/yoyoo-ddr"
   },
-  "devDependencies":{
-    "@vue/cli-plugin-babel":"^3.2.0",
-    "@vue/cli-plugin-eslint":"^3.2.0",
-    "@vue/cli-service":"^3.2.0",
-    "babel-eslint":"^10.0.1",
-    "eslint":"^5.16.0",
-    "eslint-plugin-vue":"^5.0.0",
-    "vue-template-compiler":"^2.6.10"
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.2.0",
+    "@vue/cli-plugin-eslint": "^3.2.0",
+    "@vue/cli-service": "^3.2.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "vue-template-compiler": "^2.6.10"
   },
-  "homepage":"https://zuimeiaj.github.io/ddr/",
-  "license":"MIT",
-  "eslintConfig":{
-    "root":true,
-    "env":{
-      "node":true
+  "homepage": "https://zuimeiaj.github.io/ddr/",
+  "license": "MIT",
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
     },
-    "extends":[
+    "extends": [
       "plugin:vue/essential",
       "eslint:recommended"
     ],
-    "rules":{},
-    "parserOptions":{
-      "parser":"babel-eslint"
+    "rules": {},
+    "parserOptions": {
+      "parser": "babel-eslint"
     }
   },
-  "postcss":{
-    "plugins":{
-      "autoprefixer":{}
+  "postcss": {
+    "plugins": {
+      "autoprefixer": {}
     }
   },
-  "browserslist":[
+  "browserslist": [
     "> 1%",
     "last 2 versions"
   ]
