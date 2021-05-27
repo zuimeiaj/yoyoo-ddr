@@ -1,5 +1,9 @@
 # yoyoo-ddr
 
+#### [demo演示](https://zuimeiaj.github.io/ddr/)
+#### [线上app](https://yoyoo.vivw.org/)
+#### [社区](https://vivw.org/)
+
 
 ### Installation
 ```
