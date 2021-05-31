@@ -76,6 +76,8 @@ export default {
   data() {
     return {
       transform: Object.assign({}, this.value),
+      currentRatio: 1,
+      isInitialRatio: false,
     }
   },
   watch: {
@@ -200,6 +202,7 @@ export default {
         resize: 'resizable',
         rotate: 'rotatable',
       }
+      this.isInitialRatio = false
       this[ev[this._handlerType]] && this.$emit(this._handlerType + '-end', event, this.transform)
     },
     handleResizeStart(event) {
@@ -213,7 +216,6 @@ export default {
       let y1 = clientY - this._parentRect.top - opposite.y
       let _width = rect.width,
         _height = rect.height
-      let currentRatio = _width / _height
       if (tr2bl[type]) {
         if (widthMap[type]) _height /= 2
         pressAngle = rad2deg(Math.atan2(_width, _height))
@@ -227,29 +229,44 @@ export default {
         rect,
         type,
         opposite,
-        currentRatio,
         pressAngle,
         startAngle,
       }
     },
     handleResizeMove(event) {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let { opposite, currentRatio, type, pressAngle, startAngle } = this._resizeOpt
+      let { opposite, type, pressAngle, startAngle } = this._resizeOpt
       let x = clientX - this._parentRect.left - opposite.x,
         y = clientY - this._parentRect.top - opposite.y,
-        dis = Math.hypot(y, x),
-        ratio = event.shiftKey || this.acceptRatio
+        dis = Math.hypot(y, x)
+
+      let ratio = event.shiftKey || this.acceptRatio
+
+      if (!this.isInitialRatio && ratio) {
+        this.currentRatio = this.transform.width / this.transform.height
+        this.isInitialRatio = true
+      }
+
+      if (!ratio) {
+        this.isInitialRatio = false
+      }
+
       let { w, h } = getSize({
         type,
         dis,
         x,
         y,
-        ratio,
         startAngle,
         pressAngle,
-        currentRatio,
       })
       let transform = Object.assign({}, this.transform)
+      if (this.isInitialRatio) {
+        if (widthMap[type]) h = w / this.currentRatio
+        else w = h * this.currentRatio
+      }
+      w = Math.max(Math.round(w), this.minWidth)
+      h = Math.max(Math.round(h), this.minHeight)
+
       if (widthMap[type] && !ratio) {
         transform.width = w
       } else if (heightMap[type] && !ratio) {
@@ -258,22 +275,14 @@ export default {
         transform.width = w
         transform.height = h
       }
-      if (transform.width < this.minWidth) {
-        transform.width = this.minWidth
-      }
-      if (transform.height < this.minHeight) {
-        transform.height = this.minHeight
-      }
-      transform.width = Math.round(transform.width)
-      transform.height = Math.round(transform.height)
-      currentRatio = transform.width / transform.height
+
       let matrix = getPoints(transform)
       let _opp = matrix[pointMap[type]]
       let deltaX = -(_opp.x - opposite.x),
         deltaY = -(_opp.y - opposite.y)
       transform.x = Math.round(transform.x + deltaX)
       transform.y = Math.round(transform.y + deltaY)
-      this._resizeOpt.currentRatio = currentRatio
+
       this.transform = transform
     },
     handleRotateStart(event) {
