@@ -48,7 +48,7 @@ This component cannot be used normally in the following scenarios
 | rotatable     | boolean | true                                      | Whether the component can be rotated                                            |
 | resizable     | boolean | true                                      | Whether the component can be resized                                            |
 | active        | boolean | true                                      | Whether the component is selected, it can only be operated after it is selected |
-| acceptRatio   | boolean | false                                     | Whether to limit the ratio when resizing                                        |
+| acceptRatio   | boolean | false                                     | Set to true or hold down the shift key, it will scale proportionally            |
 | resizeHandler | Array   | ['tl','tm','tr','r','br','bm','l','bl']   | Set the direction that can be resized                                           |
 | minWidth      | number  | 1                                         | Minimum width                                                                   |
 | minHeight     | number  | 1                                         | Minimum height                                                                  |
