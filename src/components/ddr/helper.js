@@ -1,15 +1,30 @@
 import Matrix from './Matrix'
 
+// 缩放时基于对角坐标固定缩放
+// 矩形除了4个直角坐标点外，还有每条边的一个中心点坐标，按照数组的顺序从左上顺时针到左中排列
+// 例如：拖拽点为右中，对应的固定点为左中。拖拽点为左上，对应的固定点为右下
 export const pointMap = {
   br: 0,
-  tr: 3,
-  tl: 2,
-  bl: 1,
-  tm: 2,
-  bm: 0,
-  l: 1,
-  r: 3,
+  bm: 1,
+  bl: 2,
+  l: 3,
+  tl: 4,
+  tm: 5,
+  tr: 6,
+  r: 7,
 }
+// 计算矩形大小时使用四个直角坐标
+export const pointMap2 = {
+  br: 0,
+  tr: 6,
+  tl: 4,
+  bl: 2,
+  tm: 4,
+  bm: 0,
+  l: 2,
+  r: 6,
+}
+
 export const widthMap = {
   l: 1,
   r: 1,
@@ -33,12 +48,13 @@ export function rad2deg(rad) {
   return (rad * 180) / Math.PI
 }
 
+// 获取矩形在平面上的8个坐标点，从左上角顺时针放到数组里返回
 export function getPoints({ x, y, width, height, rotation }) {
   let a = (rotation * Math.PI) / 180
   let wc = width / 2
   let hc = height / 2
   let deg = new Matrix([[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]])
-  let rect = new Matrix([[-wc, hc], [wc, hc], [wc, -hc], [-wc, -hc]])
+  let rect = new Matrix([[-wc, hc], [0, hc], [wc, hc], [wc, 0], [wc, -hc], [0, -hc], [-wc, -hc], [-wc, 0]])
   return deg
     .dot(rect.T())
     .T()
@@ -48,6 +64,7 @@ export function getPoints({ x, y, width, height, rotation }) {
     })
 }
 
+// 计算当前矩形的宽高
 export function getSize({ type, x, y, dis, pressAngle, startAngle }) {
   let w, h
   let currentAngle = rad2deg(Math.atan2(y, x))
@@ -59,7 +76,6 @@ export function getSize({ type, x, y, dis, pressAngle, startAngle }) {
     h = Math.sin(rad) * dis
     w = Math.cos(rad) * dis
   }
-
   return { w, h }
 }
 

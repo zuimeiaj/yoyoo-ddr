@@ -1,6 +1,6 @@
 {
   "name": "yoyoo-ddr",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A vue component that can be rotated and resized",
   "private": false,
   "main": "dist/yoyoo-ddr.umd.min.js",

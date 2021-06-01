@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { getHandler, getPoints, getSize, heightMap, pointMap, rad2deg, tr2bl, widthMap } from './helper'
+import { getHandler, getPoints, getSize, heightMap, pointMap, pointMap2, rad2deg, tr2bl, widthMap } from './helper'
 
 export default {
   name: 'ddr',
@@ -211,9 +211,10 @@ export default {
       let matrix = getPoints(rect)
       let pressAngle
       let opposite = matrix[pointMap[type]]
+      let opp2 = matrix[pointMap2[type]]
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let x1 = clientX - this._parentRect.left - opposite.x
-      let y1 = clientY - this._parentRect.top - opposite.y
+      let x1 = clientX - this._parentRect.left - opp2.x
+      let y1 = clientY - this._parentRect.top - opp2.y
       let _width = rect.width,
         _height = rect.height
       if (tr2bl[type]) {
@@ -229,19 +230,18 @@ export default {
         rect,
         type,
         opposite,
+        opp2,
         pressAngle,
         startAngle,
       }
     },
     handleResizeMove(event) {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let { opposite, type, pressAngle, startAngle } = this._resizeOpt
-      let x = clientX - this._parentRect.left - opposite.x,
-        y = clientY - this._parentRect.top - opposite.y,
+      let { opposite, opp2, type, pressAngle, startAngle } = this._resizeOpt
+      let x = clientX - this._parentRect.left - opp2.x,
+        y = clientY - this._parentRect.top - opp2.y,
         dis = Math.hypot(y, x)
-
       let ratio = event.shiftKey || this.acceptRatio
-
       if (!this.isInitialRatio && ratio) {
         this.currentRatio = this.transform.width / this.transform.height
         this.isInitialRatio = true
@@ -266,7 +266,6 @@ export default {
       }
       w = Math.max(Math.round(w), this.minWidth)
       h = Math.max(Math.round(h), this.minHeight)
-
       if (widthMap[type] && !ratio) {
         transform.width = w
       } else if (heightMap[type] && !ratio) {
