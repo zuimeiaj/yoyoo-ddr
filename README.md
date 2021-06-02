@@ -1,10 +1,10 @@
 # yoyoo-ddr
 
-#### [demo 演示](https://zuimeiaj.github.io/ddr/)
+#### [ Online demo ](https://zuimeiaj.github.io/ddr/)
 
-#### [线上 app](https://yoyoo.vivw.org/)
+#### [ Online application ](https://yoyoo.vivw.org/)
 
-#### [社区](https://vivw.org/)
+#### [ Community ](https://vivw.org/)
 
 ### Installation
 
@@ -33,6 +33,13 @@ export default {
   },
 }
 ```
+
+### Features
+
+- Lightweight and no dependencies
+- Draggable, resizable, rotatable, configurable
+- Define handles for resizing
+- Support aspect ratio
 
 ### Tips
 
@@ -74,4 +81,4 @@ The parameter transform is the position and rotation angle of the component
 
 ### License
 
-MIT
+The MIT License (MIT). Please see [License File](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/LICENSE) for more information.
