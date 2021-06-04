@@ -63,6 +63,29 @@ export function getPoints({ x, y, width, height, rotation }) {
       return { x: item[0] + wc + x, y: -(item[1] - hc) + y }
     })
 }
+export function getBoundingRect(transform) {
+  let points = getPoints(transform)
+  let xarray = [],
+    yarray = []
+  points.forEach((element) => {
+    xarray.push(element.x)
+    yarray.push(element.y)
+  })
+  xarray = xarray.sort((a, b) => a - b)
+  yarray = yarray.sort((a, b) => a - b)
+  let left = xarray[0],
+    right = xarray[xarray.length - 1]
+  let top = yarray[0],
+    bottom = yarray[yarray.length - 1]
+  return {
+    left,
+    right,
+    top,
+    bottom,
+    width: right - left,
+    height: bottom - top,
+  }
+}
 
 // 计算当前矩形的宽高
 export function getSize({ type, x, y, dis, pressAngle, startAngle }) {

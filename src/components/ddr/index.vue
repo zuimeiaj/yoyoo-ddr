@@ -23,7 +23,18 @@
 </template>
 
 <script>
-import { getHandler, getPoints, getSize, heightMap, pointMap, pointMap2, rad2deg, tr2bl, widthMap } from './helper'
+import {
+  getBoundingRect,
+  getHandler,
+  getPoints,
+  getSize,
+  heightMap,
+  pointMap,
+  pointMap2,
+  rad2deg,
+  tr2bl,
+  widthMap,
+} from './helper'
 
 export default {
   name: 'ddr',
@@ -72,6 +83,10 @@ export default {
       type: Number,
       default: 1,
     },
+    restrictBoundary: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -79,6 +94,10 @@ export default {
       currentRatio: 1,
       isInitialRatio: false,
     }
+  },
+  created() {
+    // 缓存当前位置信息
+    this.localeTransform = { ...this.transform }
   },
   watch: {
     value(t) {
@@ -156,6 +175,18 @@ export default {
       this._lastX = clientX
       this._lastY = clientY
       this._activeTarget = event.target
+      this._parentRect = this.$refs.wrapper.parentNode.getBoundingClientRect()
+      this.localeTransform = this.transform
+      // Get the movable boundary of the element in the parent element
+      if (this.restrictBoundary) {
+        let mouseDownRect = getBoundingRect(this.transform)
+        let minLeft = this.transform.x - mouseDownRect.left
+        let maxLeft = this._parentRect.width - this.transform.width - minLeft
+        let minTop = this.transform.y - mouseDownRect.top
+        let maxTop = this._parentRect.height - this.transform.height - minTop
+        this.minBoundary = { minLeft, maxLeft, minTop, maxTop }
+      }
+
       document.addEventListener('mousemove', this.handleMouseMove, false)
       document.addEventListener('touchmove', this.handleMouseMove, false)
       document.addEventListener('touchend', this.handleMouseUp, false)
@@ -166,7 +197,6 @@ export default {
         this.$emit('rotate-start', event, this.transform)
       } else if (this._activeTarget.dataset.resizetype) {
         this._handlerType = 'resize'
-        this._parentRect = this.$refs.wrapper.parentNode.getBoundingClientRect()
         this.handleResizeStart(event)
         this.$emit('resize-start', event, this.transform)
       } else {
@@ -179,18 +209,35 @@ export default {
         this.handleResizeMove(event)
         this.$emit('resize', event, this.transform)
       } else if (this._handlerType === 'drag' && this.draggable) {
-        let { clientX, clientY } = event.touches ? event.touches[0] : event
-        let deltaX = clientX - this._lastX
-        let deltaY = clientY - this._lastY
-        this._lastX = clientX
-        this._lastY = clientY
-        this.transform.x = Math.round(this.transform.x + deltaX)
-        this.transform.y = Math.round(this.transform.y + deltaY)
+        this.doMove(event)
         this.$emit('drag', event, this.transform)
       } else if (this._handlerType === 'rotate') {
         this.handleRotateMove(event)
         this.$emit('rotate', event, this.transform)
       }
+    },
+    doMove(event) {
+      let { clientX, clientY } = event.touches ? event.touches[0] : event
+      let deltaX = clientX - this._lastX
+      let deltaY = clientY - this._lastY
+      this._lastX = clientX
+      this._lastY = clientY
+      if (this.restrictBoundary) {
+        this.localeTransform.x += deltaX
+        this.localeTransform.y += deltaY
+        this.restrictToParentBoundary()
+      } else {
+        this.transform.x = Math.round(this.transform.x + deltaX)
+        this.transform.y = Math.round(this.transform.y + deltaY)
+      }
+    },
+    restrictToParentBoundary() {
+      let x = Math.max(this.minBoundary.minLeft, this.localeTransform.x)
+      let y = Math.max(this.minBoundary.minTop, this.localeTransform.y)
+      x = Math.min(this.minBoundary.maxLeft, x)
+      y = Math.min(this.minBoundary.maxTop, y)
+      this.transform.x = Math.round(x)
+      this.transform.y = Math.round(y)
     },
     handleMouseUp(event) {
       document.removeEventListener('mousemove', this.handleMouseMove, false)
