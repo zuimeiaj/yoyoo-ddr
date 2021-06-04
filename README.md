@@ -4,6 +4,8 @@
 
 #### [ Online application ](https://yoyoo.vivw.org/)
 
+#### [ Online application source code ](https://github.com/zuimeiaj/yoyoo-starter)
+
 #### [ Community ](https://vivw.org/)
 
 ### Installation
@@ -15,6 +17,7 @@ npm i yoyoo-ddr --save
 ### Usage
 
 ```javascript
+
 import DDR from 'yoyoo-ddr'
 import 'yoyoo-ddr/dist/yoyoo-ddr.css'
 
@@ -22,12 +25,56 @@ export default {
   data() {
     return {
       transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
+      active:true,
+      rotatable:true,
+      draggalbe:true,
+      resizable:true,
     }
+  },
+  methods:{
+    onDrag(event,transform){},
+    onDragStart(envent,transform){},
+    onDragEnd(event,transform){},
+    
+    onResize(event,transform){},
+    onResizeStart(event,transform){},
+    onResizeEnd(event,transform){},
+    
+    onRotate(event,transform){},
+    onRotateStart(event,transform){},
+    onRotateEnd(event,transform){},
+    
+    
+    
+    
+    
+    
   },
   render() {
     return (
-      <DDR value={this.transform}>
-        <div style="width:100%;height:100%;background:red" />
+      <DDR
+      
+        active={this.active}
+        draggable={this.draggable}
+        resizable={this.resizable}
+        rotatable={this.rotatable}
+        
+        onDrag={this.onDrag}
+        onDragStart={this.onDragStart}
+        onDragEnd={this.onDragEnd}
+        
+        onResize={this.onResize}
+        onResizeStart={this.onResizeStart}
+        onResizeEnd={this.onResizeEnd}
+        
+        onRotate={this.onResize}
+        onRotateStart={this.onRotateStart}
+        onRotateEnd={this.onRotateEnd}
+        
+        value={this.transform}
+        
+        >
+          <div style="width:100%;height:100%;background:red" />
       </DDR>
     )
   },
