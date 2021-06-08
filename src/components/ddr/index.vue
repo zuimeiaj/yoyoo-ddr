@@ -83,9 +83,9 @@ export default {
       type: Number,
       default: 1,
     },
-    restrictBoundary: {
+    parent: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
   data() {
@@ -178,7 +178,7 @@ export default {
       this._parentRect = this.$refs.wrapper.parentNode.getBoundingClientRect()
       this.localeTransform = this.transform
       // Get the movable boundary of the element in the parent element
-      if (this.restrictBoundary) {
+      if (this.parent) {
         let mouseDownRect = getBoundingRect(this.transform)
         let minLeft = this.transform.x - mouseDownRect.left
         let maxLeft = this._parentRect.width - this.transform.width - minLeft
@@ -186,7 +186,6 @@ export default {
         let maxTop = this._parentRect.height - this.transform.height - minTop
         this.minBoundary = { minLeft, maxLeft, minTop, maxTop }
       }
-
       document.addEventListener('mousemove', this.handleMouseMove, false)
       document.addEventListener('touchmove', this.handleMouseMove, false)
       document.addEventListener('touchend', this.handleMouseUp, false)
@@ -222,7 +221,7 @@ export default {
       let deltaY = clientY - this._lastY
       this._lastX = clientX
       this._lastY = clientY
-      if (this.restrictBoundary) {
+      if (this.parent) {
         this.localeTransform.x += deltaX
         this.localeTransform.y += deltaY
         this.restrictToParentBoundary()

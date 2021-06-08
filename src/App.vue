@@ -2,16 +2,16 @@
   <div id="app">
     <div class="columns">
       <h1 class="header">
-        yoyoo - ddr
-        Mobile & PC
+        yoyoo - ddr Mobile & PC
       </h1>
-      <div :style="{transform:currentScale}" class="content">
+      <div :style="{ transform: currentScale }" class="content">
         <DDR
           :draggable="controlled.draggable"
           :rotatable="controlled.rotatable"
           :resizable="controlled.resizable"
+          :parent="controlled.parent"
           :accept-ratio="controlled.acceptRatio"
-          :resize-handler="['tl','tm','tr','r','br','bm','l','bl']"
+          :resize-handler="['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl']"
           :min-width="+controlled.minWidth"
           :min-height="+controlled.minHeight"
           :active="controlled.active"
@@ -38,43 +38,42 @@
     </div>
     <div class="inspector">
       <div class="input-item" :key="item.name" v-for="item in inputs">
-        <label class="input-label">{{item.name}}</label>
+        <label class="input-label">{{ item.name }}</label>
         <input class="input-value" :type="item.type" v-model="controlled[item.name]" />
       </div>
       <div class="input-item">
         <label class="input-label">events</label>
-        <span class="input-value">{{events}}</span>
+        <span class="input-value">{{ events }}</span>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import DDR from "./components/ddr";
+import DDR from './components/ddr'
 
 export default {
-  name: "app",
+  name: 'app',
   components: { DDR },
   data() {
     return {
-      events: "",
+      events: '',
       inputs: [
-        { type: "number", name: "x" },
-        { type: "number", name: "y" },
-        { type: "number", name: "width" },
-        { type: "number", name: "height" },
-        { type: "number", name: "rotation" },
-        { type: "number", name: "zoom" },
-        { type: "number", name: "minWidth" },
-        { type: "number", name: "minHeight" },
-        { type: "checkbox", name: "acceptRatio" },
-        { type: "checkbox", name: "draggable" },
-        { type: "checkbox", name: "resizable" },
-        { type: "checkbox", name: "rotatable" },
-        { type: "checkbox", name: "active" }
+        { type: 'number', name: 'x' },
+        { type: 'number', name: 'y' },
+        { type: 'number', name: 'width' },
+        { type: 'number', name: 'height' },
+        { type: 'number', name: 'rotation' },
+        { type: 'number', name: 'minWidth' },
+        { type: 'number', name: 'minHeight' },
+        { type: 'checkbox', name: 'acceptRatio' },
+        { type: 'checkbox', name: 'draggable' },
+        { type: 'checkbox', name: 'resizable' },
+        { type: 'checkbox', name: 'rotatable' },
+        { type: 'checkbox', name: 'active' },
+        { type: 'checkbox', name: 'parent' },
       ],
       controlled: {
-        zoom: 1,
         x: 500,
         y: 100,
         width: 100,
@@ -86,68 +85,69 @@ export default {
         resizable: true,
         draggable: true,
         acceptRatio: false,
-        active: true
-      }
-    };
+        active: true,
+        parent: false,
+      },
+    }
   },
 
   computed: {
     currentScale() {
-      return `scale(${this.controlled.zoom})`;
+      return `scale(${this.controlled.zoom})`
     },
     transform() {
-      const { x, y, height, width, rotation } = this.controlled;
+      const { x, y, height, width, rotation } = this.controlled
       return {
         x: +x,
         y: +y,
         width: +width,
         height: +height,
-        rotation: +rotation
-      };
-    }
+        rotation: +rotation,
+      }
+    },
   },
   methods: {
     handler(event, transform) {
-      this.controlled = Object.assign({}, this.controlled, transform);
+      this.controlled = Object.assign({}, this.controlled, transform)
     },
     handleDragStart(e, t) {
-      this.events = "drag-start";
-      this.handler(e, t);
+      this.events = 'drag-start'
+      this.handler(e, t)
     },
     handleDrag(e, t) {
-      this.events = "drag";
-      this.handler(e, t);
+      this.events = 'drag'
+      this.handler(e, t)
     },
     handleDragEnd(e, t) {
-      this.events = "drag-end";
-      this.handler(e, t);
+      this.events = 'drag-end'
+      this.handler(e, t)
     },
     handleResizeStart(e, t) {
-      this.events = "resize-start";
-      this.handler(e, t);
+      this.events = 'resize-start'
+      this.handler(e, t)
     },
     handleResize(e, t) {
-      this.events = "resize";
-      this.handler(e, t);
+      this.events = 'resize'
+      this.handler(e, t)
     },
     handleResizeEnd(e, t) {
-      this.events = "resize-end";
-      this.handler(e, t);
+      this.events = 'resize-end'
+      this.handler(e, t)
     },
     handleRotateStart(e, t) {
-      this.events = "rotate-start";
-      this.handler(e, t);
+      this.events = 'rotate-start'
+      this.handler(e, t)
     },
     handleRotate(e, t) {
-      this.events = "rotate";
-      this.handler(e, t);
+      this.events = 'rotate'
+      this.handler(e, t)
     },
     handleRotateEnd(e, t) {
-      this.events = "rotate-end";
-      this.handler(e, t);
-    }
-  }
-};
+      this.events = 'rotate-end'
+      this.handler(e, t)
+    },
+  },
+}
 </script>
 
 <style>
@@ -158,7 +158,7 @@ export default {
 }
 
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
