@@ -28,6 +28,11 @@ export default {
       rotatable: true,
       draggalbe: true,
       resizable: true,
+      parent:false,
+      resizeHandler:["tl","tm","tr","r","br","bm","bl","l"],
+      minWidth:10,
+      minHeight:10,
+      acceptRatio:false
     }
   },
   methods: {
@@ -50,6 +55,10 @@ export default {
         draggable={this.draggable}
         resizable={this.resizable}
         rotatable={this.rotatable}
+        parent={this.parent}
+        minWidth={this.minWidth}
+        minHeight={this.minHeight}
+        acceptRatio={this.acceptRatio}
         onDrag={this.onDrag}
         onDragStart={this.onDragStart}
         onDragEnd={this.onDragEnd}
@@ -74,6 +83,9 @@ export default {
 - Draggable, resizable, rotatable, configurable
 - Define handles for resizing
 - Support aspect ratio
+- Support parent element boundary limit
+- Keep the most streamlined functions, strong scalability
+- Can be customized according to your own needs
 
 ### Tips
 
