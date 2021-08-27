@@ -2,7 +2,7 @@
 
 #### [ Online demo ](https://zuimeiaj.github.io/ddr/)
 
-#### [ Online application ](https://yoyoo.vivw.org/)
+#### [ Online application ](http://zuimeiaj.github.io/yoyoo/)
 
 #### [ Online application source code ](https://github.com/zuimeiaj/yoyoo-starter)
 
