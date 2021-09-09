@@ -1,27 +1,3 @@
-<template>
-  <div
-    ref="wrapper"
-    :style="style"
-    :class="{ active: active }"
-    @touchstart="handleMouseDown"
-    @mousedown="handleMouseDown"
-    class="yoyoo-ddr"
-  >
-    <slot></slot>
-    <div v-if="resizable">
-      <span
-        :data-resizetype="item"
-        :key="item"
-        :class="item"
-        :style="{ ...getNewHandler(item) }"
-        class="resize-handler"
-        v-for="item in resizeHandler"
-      ></span>
-    </div>
-    <span :style="rotateHandler" v-if="rotatable" data-type="rotate" class="rotate-handler"></span>
-  </div>
-</template>
-
 <script>
 import {
   getBoundingRect,
@@ -87,6 +63,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    beforeActive: {
+      type: Function,
+      default: () => false,
+    },
+    id: [Number, String],
+    renderContent: {
+      type: Function,
+    },
   },
   data() {
     return {
@@ -104,25 +88,17 @@ export default {
       this.transform = t
     },
   },
+
   computed: {
     rotateHandler() {
       let size = Math.ceil(this.handlerSize) + 'px'
-      return {
-        width: size,
-        height: size,
-        top: -25 + 'px',
-        'margin-left': -Math.floor(this.handlerSize / 2) + 'px',
-      }
+      return `width:${size};height:${size};top:-25px;margin-left:${-Math.floor(this.handlerSize / 2)}px`
     },
     style() {
       let transform = this.transform
-      return {
-        left: transform.x + 'px',
-        top: transform.y + 'px',
-        width: transform.width + 'px',
-        height: transform.height + 'px',
-        transform: `rotate(${transform.rotation}deg)`,
-      }
+      return `left:${transform.x}px;top:${transform.y}px;width:${transform.width}px;height:${
+        transform.height
+      }px;transform:rotate(${transform.rotation}deg)`
     },
   },
   methods: {
@@ -160,16 +136,19 @@ export default {
           props = { 'margin-top': half, left: half }
           break
       }
-      return {
+      let result = {
         cursor: cursor + '-resize',
         width: Math.ceil(handlerSize) + 'px',
         height: Math.ceil(handlerSize) + 'px',
         ...props,
       }
+      return Object.keys(result)
+        .map((item) => `${item}:${result[item]}`)
+        .join(';')
     },
 
     handleMouseDown(event) {
-      if (!this.active) return
+      if (!this.active && !this.beforeActive(this.id)) return
       let point = event.touches ? event.touches[0] : event
       let { clientX, clientY } = point
       this._lastX = clientX
@@ -351,6 +330,34 @@ export default {
       r = r < 0 ? r + 360 : r
       this.transform.rotation = Math.floor(r)
     },
+  },
+  render() {
+    return (
+      <div
+        ref="wrapper"
+        style={this.style}
+        class={`yoyoo-ddr ${this.active ? 'active' : ''}`}
+        onTouchstart={this.handleMouseDown}
+        onMousedown={this.handleMouseDown}
+      >
+        {this.renderContent ? this.renderContent(this) : this.$slots.default}
+        {this.resizable && (
+          <div>
+            {this.resizeHandler.map((item) => {
+              return (
+                <span
+                  data-resizetype={item}
+                  key={item}
+                  style={this.getNewHandler(item)}
+                  class={`resize-handler ${item}`}
+                />
+              )
+            })}
+          </div>
+        )}
+        {this.rotatable && <span style={this.rotateHandler} data-type="rotate" class="rotate-handler" />}
+      </div>
+    )
   },
 }
 </script>

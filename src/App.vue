@@ -1,63 +1,10 @@
-<template>
-  <div id="app">
-    <div class="columns">
-      <h1 class="header">
-        yoyoo - ddr Mobile & PC
-      </h1>
-      <div :style="{ transform: currentScale }" class="content">
-        <DDR
-          :draggable="controlled.draggable"
-          :rotatable="controlled.rotatable"
-          :resizable="controlled.resizable"
-          :parent="controlled.parent"
-          :accept-ratio="controlled.acceptRatio"
-          :resize-handler="['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl']"
-          :min-width="+controlled.minWidth"
-          :min-height="+controlled.minHeight"
-          :active="controlled.active"
-          :value="transform"
-          :zoom="controlled.zoom"
-          @drag-start="handleDragStart"
-          @drag="handleDrag"
-          @drag-end="handleDragEnd"
-          @resize-start="handleResizeStart"
-          @resize="handleResize"
-          @resize-end="handleResizeEnd"
-          @rotate-start="handleRotateStart"
-          @rotate="handleRotate"
-          @rotate-end="handleRotateEnd"
-        >
-          <div class="cell"></div>
-        </DDR>
-      </div>
-      <footer class="footer">
-        <a target="_blank" href="https://zuimeiaj.github.io/yoyoo/">YOYOO原型设计 - 一个在线高保真原型设计工具</a>
-        <a target="_blank" href="https://vivw.org/">Vivw社区 - 一个基于JavaScript的垂直化前端技术社区</a>
-        <a target="_blank" href="https://github.com/zuimeiaj/yoyoo-ddr">Github</a>
-      </footer>
-    </div>
-    <div class="inspector">
-      <div class="input-item" :key="item.name" v-for="item in inputs">
-        <label class="input-label">{{ item.name }}</label>
-        <input class="input-value" :type="item.type" v-model="controlled[item.name]" />
-      </div>
-      <div class="input-item">
-        <label class="input-label">events</label>
-        <span class="input-value">{{ events }}</span>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script>
-import DDR from './components/ddr'
-
+import ControlsWrapperVue from './ControlsWrapper.vue'
+let k = 0
 export default {
   name: 'app',
-  components: { DDR },
   data() {
     return {
-      events: '',
       inputs: [
         { type: 'number', name: 'x' },
         { type: 'number', name: 'y' },
@@ -73,79 +20,171 @@ export default {
         { type: 'checkbox', name: 'active' },
         { type: 'checkbox', name: 'parent' },
       ],
-      controlled: {
-        x: 500,
-        y: 100,
-        width: 100,
-        height: 100,
-        rotation: 0,
-        minHeight: 10,
-        minWidth: 10,
-        rotatable: true,
-        resizable: true,
-        draggable: true,
-        acceptRatio: false,
-        active: true,
-        parent: false,
-      },
+      controls: [],
+      currentId: '',
+      controlled: {},
     }
   },
-
-  computed: {
-    currentScale() {
-      return `scale(${this.controlled.zoom})`
-    },
-    transform() {
-      const { x, y, height, width, rotation } = this.controlled
-      return {
-        x: +x,
-        y: +y,
-        width: +width,
-        height: +height,
-        rotation: +rotation,
+  created() {
+    // 2000个组件勉强还能拖动 😓
+    let controls = []
+    let size = 50
+    let space = 20
+    for (let i = 1; i < 50; i++) {
+      for (let j = 1; j < 40; j++) {
+        controls.push({
+          transform: {
+            x: j * size + space * j,
+            y: i * size + space * i,
+            width: size,
+            height: size,
+            rotation: 0,
+          },
+          minHeight: 10,
+          minWidth: 10,
+          rotatable: true,
+          resizable: true,
+          draggable: true,
+          acceptRatio: false,
+          active: false,
+          parent: false,
+          id: String(k++),
+          resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
+        })
       }
-    },
+    }
+    this.controls = controls
+    this.beforeActive(this.controls[0].id)
   },
   methods: {
-    handler(event, transform) {
-      this.controlled = Object.assign({}, this.controlled, transform)
+    addControl() {
+      this.controls = this.controls.concat([
+        {
+          id: String(k++),
+          transform: {
+            x: Math.floor(Math.random() * 800 + 10),
+            y: Math.floor(Math.random() * 400 + 10),
+            width: Math.floor(Math.random() * 100 + 50),
+            height: Math.floor(Math.random() * 100 + 50),
+            rotation: 0,
+          },
+          minHeight: 10,
+          minWidth: 10,
+          rotatable: true,
+          resizable: true,
+          draggable: true,
+          acceptRatio: false,
+          active: false,
+          parent: false,
+          resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
+        },
+      ])
     },
-    handleDragStart(e, t) {
-      this.events = 'drag-start'
-      this.handler(e, t)
+    updateControlValue(id, key, value) {
+      this.controls = this.controls.map((item) => {
+        if (item.id === id) {
+          if (['x', 'y', 'width', 'height', 'rotation'].includes(key)) {
+            item = { ...item }
+            let transform = { ...item.transform }
+            transform[key] = value
+            item.transform = transform
+            return item
+          }
+          return { ...item, [key]: value }
+        }
+        return item
+      })
     },
-    handleDrag(e, t) {
-      this.events = 'drag'
-      this.handler(e, t)
+    handleTransform(newTransform, handleType) {
+      this.controlled = { ...this.controlled, ...newTransform }
+      // 仅在结束时将数据同步
+      if (['resizeend', 'dragend', 'rotateend'].includes(handleType)) {
+        this.updateControlValue(this.currentId, 'transform', newTransform)
+      }
     },
-    handleDragEnd(e, t) {
-      this.events = 'drag-end'
-      this.handler(e, t)
+    updateControlStatus(id) {
+      this.controls = this.controls.map((item) => {
+        if (item.id == id) {
+          return { ...item, active: true }
+        } else if (item.active) {
+          return { ...item, active: false }
+        }
+        return item
+      })
     },
-    handleResizeStart(e, t) {
-      this.events = 'resize-start'
-      this.handler(e, t)
+    beforeActive(id) {
+      let control = this.controls.find((item) => item.id === id)
+      this.controlled = { ...control, ...control.transform, active: true }
+      this.currentId = id
+      this.updateControlStatus(id)
+      return true
     },
-    handleResize(e, t) {
-      this.events = 'resize'
-      this.handler(e, t)
+    handleSelect(value) {
+      this.list = this.list.map((item) => {
+        if (item.id == value.id) {
+          return { ...item, num: item.num + 1 }
+        }
+        return item
+      })
     },
-    handleResizeEnd(e, t) {
-      this.events = 'resize-end'
-      this.handler(e, t)
+    handleChange(e) {
+      let type = e.target.dataset.type
+      let name = e.target.dataset.name
+      this.controlled[name] = e.target.value
+      // 注意节流优化提升性能
+      this.updateControlValue(this.currentId, name, type === 'checkbox' ? e.target.checked : +e.target.value)
     },
-    handleRotateStart(e, t) {
-      this.events = 'rotate-start'
-      this.handler(e, t)
-    },
-    handleRotate(e, t) {
-      this.events = 'rotate'
-      this.handler(e, t)
-    },
-    handleRotateEnd(e, t) {
-      this.events = 'rotate-end'
-      this.handler(e, t)
-    },
+  },
+  render() {
+    return (
+      <div id="app">
+        <div class="columns">
+          <h1 class="header">
+            <span>轻量级无依赖、可拖拽、缩放、旋转的vue组件</span>
+            <span>
+              渲染 <strong>2000</strong> 个组件 选中第{this.currentId}个
+            </span>
+            <button class="button" onClick={this.addControl}>
+              添加控件
+            </button>
+          </h1>
+          <ControlsWrapperVue
+            onTransform={this.handleTransform}
+            beforeActive={this.beforeActive}
+            value={this.controls}
+          />
+          <footer class="footer">
+            <a target="_blank" href="https://zuimeiaj.github.io/yoyoo/">
+              可视化编辑器
+            </a>
+            <a target="_blank" href="https://vivw.org/">
+              前端社区
+            </a>
+            <a target="_blank" href="https://github.com/zuimeiaj/yoyoo-ddr">
+              Github
+            </a>
+          </footer>
+        </div>
+        <div class="inspector">
+          {this.inputs.map((item) => {
+            return (
+              <div class="input-item" key={item.name}>
+                <label class="input-label">{item.name}</label>
+                <input
+                  data-type={item.type}
+                  data-name={item.name}
+                  onInput={this.handleChange}
+                  class="input-value"
+                  type={item.type}
+                  checked={this.controlled[item.name]}
+                  value={this.controlled[item.name]}
+                />
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
   },
 }
 </script>
@@ -166,6 +205,16 @@ export default {
   height: 100vh;
 }
 
+.button {
+  padding: 6px 24px;
+  font-size: 14px;
+
+  border: 1px solid #d3d3d3;
+  color: #353535;
+}
+.button:hover {
+  background: #ccc;
+}
 .columns {
   display: flex;
   flex-direction: column;
@@ -180,19 +229,28 @@ export default {
   font-size: 14px;
   font-weight: 400;
   color: #333;
+  display: flex;
+  justify-content: space-between;
 }
 
 .columns .content {
   flex: 1;
   position: relative;
-  overflow: hidden;
+  overflow: scroll;
 }
 
 .cell {
   position: absolute;
-  background: rgba(156, 39, 176, 0.34);
+  background: #f5f5f5;
+  border: 1px solid #d3d3d3;
   width: 100%;
   height: 100%;
+  cursor: move;
+  user-select: none;
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .inspector {
@@ -206,10 +264,15 @@ export default {
   display: flex;
   padding: 0px 10px;
   margin-top: 10px;
+  font-size: 14px;
 }
 
 .input-item input {
   padding-left: 8px;
+  height: 24px;
+  font-size: 14px;
+  border-radius: 0;
+  border: 1px solid #d3d3d3;
 }
 
 .input-label {
@@ -222,14 +285,15 @@ export default {
 }
 
 .footer {
-  font-size: 12px;
-  padding: 2px 15px;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 15px 15px;
   padding-left: 10px;
 }
 
 .footer a {
   margin-right: 20px;
-  color: #989898;
+  color: #666;
   text-decoration: none;
 }
 
@@ -250,11 +314,11 @@ export default {
   }
 
   .input-label {
-    font-size: 10px;
+    font-size: 14px;
   }
 
   .input-value {
-    font-size: 10px;
+    font-size: 14px;
     width: 70px;
   }
 }

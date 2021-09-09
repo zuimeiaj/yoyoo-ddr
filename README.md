@@ -14,6 +14,18 @@
 npm i yoyoo-ddr --save
 ```
 
+### Changelog
+
+Optimize performance issues when array loop rendering
+
+### [ v0.4 ] - September 9, 2021
+
+- Add the ID parameter, and use beforeActive to get the currently selected component when cooperating with the array loop rendering
+- Add the beforeActive function parameter. This function passes in the component ID and returns a boolean value. When the return value is true, the component will ignore the active attribute and make the component available immediately
+- Add the renderContent function, which passes in the current component instance and returns a dom tree, which is used to customize the content of the rendering component and replace the "<slot>" method when the array is rendered in a loop
+- Modify template to render function
+- Rendering 2000 components at a time barely works normally 😓
+
 ### Usage
 
 ```javascript
@@ -28,11 +40,11 @@ export default {
       rotatable: true,
       draggalbe: true,
       resizable: true,
-      parent:false,
-      resizeHandler:["tl","tm","tr","r","br","bm","bl","l"],
-      minWidth:10,
-      minHeight:10,
-      acceptRatio:false
+      parent: false,
+      resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'bl', 'l'],
+      minWidth: 10,
+      minHeight: 10,
+      acceptRatio: false,
     }
   },
   methods: {
@@ -47,6 +59,16 @@ export default {
     onRotate(event, transform) {},
     onRotateStart(event, transform) {},
     onRotateEnd(event, transform) {},
+
+    beforeActive(id) {
+      // cell-id
+      return true
+    },
+
+    renderContent(cell) {
+      // cell instance of DDR
+      return <div class="cell" style="width:100%;height:100%;background:red" />
+    },
   },
   render() {
     return (
@@ -69,9 +91,10 @@ export default {
         onRotateStart={this.onRotateStart}
         onRotateEnd={this.onRotateEnd}
         value={this.transform}
-      >
-        <div style="width:100%;height:100%;background:red" />
-      </DDR>
+        id={'cell-id'}
+        beforeActive={this.beforeActive}
+        renderContent={this.renderContent}
+      />
     )
   },
 }
@@ -95,18 +118,21 @@ This component cannot be used normally in the following scenarios
 
 ### Props
 
-| name          | type    | default                                   | desc                                                                            |
-| ------------- | ------- | ----------------------------------------- | ------------------------------------------------------------------------------- |
-| draggable     | boolean | true                                      | Whether the component can be dragged                                            |
-| rotatable     | boolean | true                                      | Whether the component can be rotated                                            |
-| resizable     | boolean | true                                      | Whether the component can be resized                                            |
-| active        | boolean | true                                      | Whether the component is selected, it can only be operated after it is selected |
-| acceptRatio   | boolean | false                                     | Set to true or hold down the shift key, it will scale proportionally            |
-| parent        | boolean | false                                     | When set to true, it will be restricted to move in the parent element           |
-| resizeHandler | Array   | ['tl','tm','tr','r','br','bm','l','bl']   | Set the direction that can be resized                                           |
-| minWidth      | number  | 1                                         | Minimum width                                                                   |
-| minHeight     | number  | 1                                         | Minimum height                                                                  |
-| value         | Object  | {x:0,y:0,width:100,height:100,rotation:0} | Controls the position, size, and rotation of components                         |
+| name          | type     | default                                   | desc                                                                                                                                                   |
+| ------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| draggable     | boolean  | true                                      | Whether the component can be dragged                                                                                                                   |
+| rotatable     | boolean  | true                                      | Whether the component can be rotated                                                                                                                   |
+| resizable     | boolean  | true                                      | Whether the component can be resized                                                                                                                   |
+| active        | boolean  | true                                      | Whether the component is selected, it can only be operated after it is selected                                                                        |
+| acceptRatio   | boolean  | false                                     | Set to true or hold down the shift key, it will scale proportionally                                                                                   |
+| parent        | boolean  | false                                     | When set to true, it will be restricted to move in the parent element                                                                                  |
+| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | Set the direction that can be resized                                                                                                                  |
+| minWidth      | number   | 1                                         | Minimum width                                                                                                                                          |
+| minHeight     | number   | 1                                         | Minimum height                                                                                                                                         |
+| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | Controls the position, size, and rotation of components                                                                                                |
+| id            | string   | undefined                                 | This id is passed through the beforeActive function when the array is rendered in a loop, and is used to obtain the component currently being dragged. |
+| beforeActive  | Function | ()=> false                                | When the function returns true, it ignores active and can be dragged immediately                                                                       |
+| renderContent | Function | ()=> VNode                                | When the array is rendered in a loop, it is used to replace the slot slot to customize the content of the component                                    |
 
 ### Events
 
