@@ -26,12 +26,11 @@ export default {
     }
   },
   created() {
-    // 2000个组件勉强还能拖动 😓
     let controls = []
     let size = 50
     let space = 20
-    for (let i = 1; i < 50; i++) {
-      for (let j = 1; j < 40; j++) {
+    for (let i = 1; i < 5; i++) {
+      for (let j = 1; j < 4; j++) {
         controls.push({
           transform: {
             x: j * size + space * j,
@@ -47,7 +46,7 @@ export default {
           draggable: true,
           acceptRatio: false,
           active: false,
-          parent: false,
+          parent: true,
           id: String(k++),
           resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
         })
@@ -62,8 +61,8 @@ export default {
         {
           id: String(k++),
           transform: {
-            x: Math.floor(Math.random() * 800 + 10),
-            y: Math.floor(Math.random() * 400 + 10),
+            x: Math.floor(Math.random() * 100 + 10),
+            y: Math.floor(Math.random() * 200 + 10),
             width: Math.floor(Math.random() * 100 + 50),
             height: Math.floor(Math.random() * 100 + 50),
             rotation: 0,
@@ -142,7 +141,7 @@ export default {
           <h1 class="header">
             <span>轻量级无依赖、可拖拽、缩放、旋转的vue组件</span>
             <span>
-              渲染 <strong>2000</strong> 个组件 选中第{this.currentId}个
+              渲染 <strong>20</strong> 个组件 选中第{this.currentId}个
             </span>
             <button class="button" onClick={this.addControl}>
               添加控件
@@ -236,7 +235,7 @@ export default {
 .columns .content {
   flex: 1;
   position: relative;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 .cell {

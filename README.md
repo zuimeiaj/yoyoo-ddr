@@ -24,7 +24,7 @@ Optimize performance issues when array loop rendering
 - Add the beforeActive function parameter. This function passes in the component ID and returns a boolean value. When the return value is true, the component will ignore the active attribute and make the component available immediately
 - Add the renderContent function, which passes in the current component instance and returns a dom tree, which is used to customize the content of the rendering component and replace the "<slot>" method when the array is rendered in a loop
 - Modify template to render function
-- Rendering 2000 components at a time barely works normally 😓
+- Rendering 2000 components at a time barely works normally 
 
 ### Usage
 
