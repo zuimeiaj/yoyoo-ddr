@@ -112,9 +112,11 @@ export default {
 
 ### Tips
 
-This component cannot be used normally in the following scenarios
+- This component cannot be used normally in the following scenarios
 
 `transform:scale(2)`
+  
+- Does not support vue3
 
 ### Props
 
