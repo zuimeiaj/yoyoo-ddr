@@ -118,6 +118,8 @@ export default {
   
 - Does not support vue3
 
+- The property "parent" is only valid in drag
+
 ### Props
 
 | name          | type     | default                                   | desc                                                                                                                                                   |
