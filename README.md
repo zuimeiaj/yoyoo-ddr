@@ -1,12 +1,3 @@
-# yoyoo-ddr
-
-#### [ Online demo ](https://zuimeiaj.github.io/ddr/)
-
-#### [ Online application ](http://zuimeiaj.github.io/yoyoo/)
-
-#### [ Online application source code ](https://github.com/zuimeiaj/yoyoo-starter)
-
-#### [ Community ](https://vivw.org/)
 
 ### Installation
 
@@ -155,6 +146,12 @@ The parameter transform is the position and rotation angle of the component
 | resizeStart | (event,transform)=>{} :void 0 |
 | resize      | (event,transform)=>{} :void 0 |
 | resizeEnd   | (event,transform)=>{} :void 0 |
+  
+### links
+
+ [ demo https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
+
+ [ design tool http://zuimeiaj.github.io/yoyoo/](http://zuimeiaj.github.io/yoyoo/)
 
 ### License
 
