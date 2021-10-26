@@ -1,23 +1,22 @@
 
-### Installation
+### 安装
 
 ```
 npm i yoyoo-ddr --save
 ```
 
-### Changelog
+### 更新日志
 
-Optimize performance issues when array loop rendering
+优化大数组渲染时的性能问题
 
 ### [ v0.4 ] - September 9, 2021
 
-- Add the ID parameter, and use beforeActive to get the currently selected component when cooperating with the array loop rendering
-- Add the beforeActive function parameter. This function passes in the component ID and returns a boolean value. When the return value is true, the component will ignore the active attribute and make the component available immediately
-- Add the renderContent function, which passes in the current component instance and returns a dom tree, which is used to customize the content of the rendering component and replace the "<slot>" method when the array is rendered in a loop
-- Modify template to render function
-- Rendering 2000 components at a time barely works normally 
+- 添加ID参数，配合数组渲染时使用beforeActive获取当前选中的组件
+- 添加 beforeActive 函数参数。 此函数传入组件 ID 并返回一个布尔值。 当返回值为true时，组件会忽略active属性，让组件立即可用
+- 添加renderContent函数参数，单个组件渲染时可以直接用slot的方式，数组渲染时建议使用该函数返回子节点
+- 将template 改为render方式
 
-### Usage
+### 使用
 
 ```javascript
 import DDR from 'yoyoo-ddr'
@@ -89,51 +88,53 @@ export default {
     )
   },
 }
+
+
+单组件使用时可直接使用slot的方式
+<DDR>
+  <CustomChild></CustomChild>
+</DDR>
+
+参数 id、beforeActive、renderContent是专为大数组渲染时提供的
+
+</DDR> 
 ```
 
-### Features
+### 特色
 
-- Lightweight and no dependencies
-- Draggable, resizable, rotatable, configurable
-- Define handles for resizing
-- Support aspect ratio
-- Support parent element boundary limit
-- Keep the most streamlined functions, strong scalability
-- Can be customized according to your own needs
+- 轻量级，无任何依赖
+- 可配置拖拽、旋转、缩放、支持大数组渲染
 
-### Tips
+### 注意事项
 
-- This component cannot be used normally in the following scenarios
+- 如果使用了 `transform:scale(2)` 会导致位置不对问题
+- 基于vue 2 开发，不支持vue3
+- parent属性目前仅支持拖拽
+- 父容器如果使用了overflow scroll 也会导致拖拽位置问题
 
-`transform:scale(2)`
-  
-- Does not support vue3
 
-- The property "parent" is only valid in drag
+### 属性
 
-### Props
+| 名称          | 类型      | 默认值                                      | 描述                                                                           |
+| ------------- | -------- | ----------------------------------------- | ----------------------------------------------------------------------------------------
+| draggable     | boolean  | true                                      | 是否可拖拽                                                                       |
+| rotatable     | boolean  | true                                      | 是否可旋转                                                                       |
+| resizable     | boolean  | true                                      | 是否可缩放                                                                       |
+| active        | boolean  | true                                      | 是否可用，                                                                       |
+| acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                      |
+| parent        | boolean  | false                                     | 限制在父容器内拖拽，仅拖拽时才会判断                                                 |
+| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                    |
+| minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                  |
+| minHeight     | number   | 1                                         | 可缩放最小高度                                                                    |
+| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持v-model，但能响应value的更新                       |
+| id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                    |
+| beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入id                              |
+| renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot就行了           |
 
-| name          | type     | default                                   | desc                                                                                                                                                   |
-| ------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| draggable     | boolean  | true                                      | Whether the component can be dragged                                                                                                                   |
-| rotatable     | boolean  | true                                      | Whether the component can be rotated                                                                                                                   |
-| resizable     | boolean  | true                                      | Whether the component can be resized                                                                                                                   |
-| active        | boolean  | true                                      | Whether the component is selected, it can only be operated after it is selected                                                                        |
-| acceptRatio   | boolean  | false                                     | Set to true or hold down the shift key, it will scale proportionally                                                                                   |
-| parent        | boolean  | false                                     | When set to true, it will be restricted to move in the parent element. currently only works on dragging, and it is planned to provide support for rotation and resizing in future versions                                                                                  |
-| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | Set the direction that can be resized                                                                                                                  |
-| minWidth      | number   | 1                                         | Minimum width                                                                                                                                          |
-| minHeight     | number   | 1                                         | Minimum height                                                                                                                                         |
-| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | Controls the position, size, and rotation of components                                                                                                |
-| id            | string   | undefined                                 | This id is passed through the beforeActive function when the array is rendered in a loop, and is used to obtain the component currently being dragged. |
-| beforeActive  | Function | ()=> false                                | When the function returns true, it ignores active and can be dragged immediately                                                                       |
-| renderContent | Function | ()=> VNode                                | When the array is rendered in a loop, it is used to replace the slot slot to customize the content of the component                                    |
+### 事件
 
-### Events
+拖拽、旋转、缩放时会触发一系列事件，该事件都会传入两个参数，第一个参数为原始的事件对象，第二个参数为当前组件的位置信息。
 
-The parameter event is the component's native event object
-
-The parameter transform is the position and rotation angle of the component
 
 | name        | args                          |
 | ----------- | ----------------------------- |
@@ -147,11 +148,11 @@ The parameter transform is the position and rotation angle of the component
 | resize      | (event,transform)=>{} :void 0 |
 | resizeEnd   | (event,transform)=>{} :void 0 |
   
-### links
+### 链接
 
- [ demo https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
+ [ 在线演示 https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
 
- [ design tool http://zuimeiaj.github.io/yoyoo/](http://zuimeiaj.github.io/yoyoo/)
+ [ 设计工具，使用react实现的 http://zuimeiaj.github.io/yoyoo/](http://zuimeiaj.github.io/yoyoo/)
 
 ### License
 
