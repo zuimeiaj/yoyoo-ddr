@@ -9,7 +9,7 @@ npm i yoyoo-ddr --save
 
 优化大数组渲染时的性能问题
 
-### [ v0.4 ] - September 9, 2021
+### [ v0.4 ] - 2021-09-09
 
 - 添加ID参数，配合数组渲染时使用beforeActive获取当前选中的组件
 - 添加 beforeActive 函数参数。 此函数传入组件 ID 并返回一个布尔值。 当返回值为true时，组件会忽略active属性，让组件立即可用
