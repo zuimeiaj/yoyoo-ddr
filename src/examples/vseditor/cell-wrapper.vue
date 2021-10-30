@@ -63,6 +63,7 @@ export default {
   },
   render() {
     let item = this.item
+    console.log({ ...item.transform })
     return (
       <DragCell
         key={item.id}

@@ -25,7 +25,7 @@ export default {
     handleChange(e, item) {
       this.$emit('change', {
         ...item,
-        value: e.target.value,
+        value: +e.target.value,
         checked: e.target.checked,
       })
     },

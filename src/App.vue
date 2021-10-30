@@ -90,12 +90,21 @@ export default {
     },
     //  组件选中，需要将之前选中的组件设置为未选中状态
     handleSelect(control) {
+      this.setCurrentControl(control)
+      this.updateControlStatus(control.id)
+    },
+    setCurrentControl(control) {
+      // 后退时可能没得了
+      if (!control || !control.id) {
+        this.controlled = {}
+        this.currentId = ''
+        return
+      }
       // 深度拷贝数据，避免数据引用污染
       control = JSON.parse(JSON.stringify(control))
       Object.assign(control, control.transform, { active: true })
       this.controlled = control
       this.currentId = control.id
-      this.updateControlStatus(control.id)
     },
 
     // 属性编辑器变化后同步到组件中
@@ -109,6 +118,13 @@ export default {
       // 注意节流优化提升性能
       this.updateControlValue(this.currentId, name, type === 'checkbox' ? checked : value, extra)
     },
+    getActiveComponent(ctls) {
+      return ctls.find((item) => item.active)
+    },
+    setControls(controls) {
+      this.controls = controls
+      historys.push(this.controls)
+    },
 
     // Actions
     handleUndo() {
@@ -116,6 +132,7 @@ export default {
       let last = historys.pop()
       redoHistorys.push(last)
       this.controls = historys[historys.length - 1] || []
+      this.setCurrentControl(this.getActiveComponent(this.controls))
     },
     handleDelete() {
       if (!this.currentId) {
@@ -123,18 +140,19 @@ export default {
       }
       let controls = this.controls.filter((item) => item.id !== this.currentId)
       this.setControls(controls)
+      this.setCurrentControl(null)
     },
     handleClear() {
       this.setControls([])
-    },
-    handleRedo() {
-      if (redoHistorys.length === 0) return
-      this.setControls(redoHistorys.pop())
+      this.controlled = {}
+      this.currentId = ''
     },
 
-    setControls(controls) {
-      this.controls = controls
-      historys.push(this.controls)
+    handleRedo() {
+      if (redoHistorys.length === 0) return
+      let contrls = redoHistorys.pop()
+      this.setControls(contrls)
+      this.setCurrentControl(this.getActiveComponent(contrls))
     },
   },
   created() {
