@@ -9,6 +9,10 @@ npm i yoyoo-ddr --save
 
 优化大数组渲染时的性能问题
 
+### [ v0.4.1] - 2021-10-30
+
+- 修改事件名称改为全小写 ，例如 dragStart 修改为 dragstart，使用render函数时用onDragstart监听事件。
+
 ### [ v0.4 ] - 2021-09-09
 
 - 添加ID参数，配合数组渲染时使用beforeActive获取当前选中的组件
@@ -72,14 +76,14 @@ export default {
         minHeight={this.minHeight}
         acceptRatio={this.acceptRatio}
         onDrag={this.onDrag}
-        onDragStart={this.onDragStart}
-        onDragEnd={this.onDragEnd}
+        onDragstart={this.onDragStart}
+        onDragend={this.onDragEnd}
         onResize={this.onResize}
-        onResizeStart={this.onResizeStart}
-        onResizeEnd={this.onResizeEnd}
+        onResizestart={this.onResizeStart}
+        onResizesnd={this.onResizeEnd}
         onRotate={this.onResize}
-        onRotateStart={this.onRotateStart}
-        onRotateEnd={this.onRotateEnd}
+        onRotatestart={this.onRotateStart}
+        onRotateend={this.onRotateEnd}
         value={this.transform}
         id={'cell-id'}
         beforeActive={this.beforeActive}
@@ -138,15 +142,15 @@ export default {
 
 | name        | args                          |
 | ----------- | ----------------------------- |
-| dragStart   | (event,transform)=>{} :void 0 |
+| dragstart   | (event,transform)=>{} :void 0 |
 | drag        | (event,transform)=>{} :void 0 |
-| dragEnd     | (event,transform)=>{} :void 0 |
-| rotateStart | (event,transform)=>{} :void 0 |
+| dragend     | (event,transform)=>{} :void 0 |
+| rotatestart | (event,transform)=>{} :void 0 |
 | rotate      | (event,transform)=>{} :void 0 |
-| rotateEnd   | (event,transform)=>{} :void 0 |
-| resizeStart | (event,transform)=>{} :void 0 |
+| rotateend   | (event,transform)=>{} :void 0 |
+| resizestart | (event,transform)=>{} :void 0 |
 | resize      | (event,transform)=>{} :void 0 |
-| resizeEnd   | (event,transform)=>{} :void 0 |
+| resizeend   | (event,transform)=>{} :void 0 |
   
 ### 链接
 
