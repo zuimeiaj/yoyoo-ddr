@@ -172,14 +172,14 @@ export default {
       if (event.target.dataset.type === 'rotate') {
         this._handlerType = 'rotate'
         this.handleRotateStart(event)
-        this.$emit('rotate-start', event, this.transform)
+        this.$emit('rotatestart', event, this.transform)
       } else if (this._activeTarget.dataset.resizetype) {
         this._handlerType = 'resize'
         this.handleResizeStart(event)
-        this.$emit('resize-start', event, this.transform)
+        this.$emit('resizestart', event, this.transform)
       } else {
         this._handlerType = 'drag'
-        this.draggable && this.$emit('drag-start', event, this.transform)
+        this.draggable && this.$emit('dragstart', event, this.transform)
       }
     },
     handleMouseMove(event) {
@@ -228,7 +228,7 @@ export default {
         rotate: 'rotatable',
       }
       this.isInitialRatio = false
-      this[ev[this._handlerType]] && this.$emit(this._handlerType + '-end', event, this.transform)
+      this[ev[this._handlerType]] && this.$emit(this._handlerType + 'end', event, this.transform)
     },
     handleResizeStart(event) {
       let type = event.target.dataset.resizetype

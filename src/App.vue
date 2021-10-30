@@ -1,70 +1,33 @@
 <script>
-import ControlsWrapperVue from './ControlsWrapper.vue'
-let k = 0
+import ComponentsVue from './examples/vseditor/components.vue'
+import EditorViewVue from './examples/vseditor/editor-view.vue'
+import { EVENT_COMPONENT_ADD, EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './examples/vseditor/event-enums'
+import FooterVue from './examples/vseditor/footer.vue'
+import HeaderVue from './examples/vseditor/header.vue'
+import PropInspectorVue from './examples/vseditor/prop-inspector.vue'
+const historys = []
+const redoHistorys = []
 export default {
   name: 'app',
   data() {
     return {
-      inputs: [
-        { type: 'number', name: 'x' },
-        { type: 'number', name: 'y' },
-        { type: 'number', name: 'width' },
-        { type: 'number', name: 'height' },
-        { type: 'number', name: 'rotation' },
-        { type: 'number', name: 'minWidth' },
-        { type: 'number', name: 'minHeight' },
-        { type: 'checkbox', name: 'acceptRatio' },
-        { type: 'checkbox', name: 'draggable' },
-        { type: 'checkbox', name: 'resizable' },
-        { type: 'checkbox', name: 'rotatable' },
-        { type: 'checkbox', name: 'active' },
-        { type: 'checkbox', name: 'parent' },
-      ],
       controls: [],
       currentId: '',
       controlled: {},
     }
   },
-  created() {
-    let controls = []
-    let size = 50
-    let space = 20
-    for (let i = 1; i < 5; i++) {
-      for (let j = 1; j < 4; j++) {
-        controls.push({
-          transform: {
-            x: j * size + space * j,
-            y: i * size + space * i,
-            width: size,
-            height: size,
-            rotation: 0,
-          },
-          minHeight: 10,
-          minWidth: 10,
-          rotatable: true,
-          resizable: true,
-          draggable: true,
-          acceptRatio: false,
-          active: false,
-          parent: true,
-          id: String(k++),
-          resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
-        })
-      }
-    }
-    this.controls = controls
-    this.beforeActive(this.controls[0].id)
-  },
   methods: {
-    addControl() {
-      this.controls = this.controls.concat([
-        {
-          id: String(k++),
+    addControl(components) {
+      let controls = this.controls.concat(
+        components.map((item) => ({
+          id: Math.random()
+            .toString()
+            .slice(2, 10),
           transform: {
-            x: Math.floor(Math.random() * 100 + 10),
-            y: Math.floor(Math.random() * 200 + 10),
-            width: Math.floor(Math.random() * 100 + 50),
-            height: Math.floor(Math.random() * 100 + 50),
+            x: item.x,
+            y: item.y,
+            width: item.width,
+            height: item.height,
             rotation: 0,
           },
           minHeight: 10,
@@ -76,33 +39,46 @@ export default {
           active: false,
           parent: false,
           resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
-        },
-      ])
+          extra: item,
+        }))
+      )
+      this.setControls(controls)
+      // 默认选中最后一个
+      this.handleSelect(controls[controls.length - 1])
     },
-    updateControlValue(id, key, value) {
-      this.controls = this.controls.map((item) => {
+
+    updateControlValue(id, key, value, extra) {
+      let controls = this.controls.map((item) => {
         if (item.id === id) {
+          item = { ...item }
           if (['x', 'y', 'width', 'height', 'rotation'].includes(key)) {
-            item = { ...item }
             let transform = { ...item.transform }
             transform[key] = value
             item.transform = transform
             return item
           }
-          return { ...item, [key]: value }
+          if (extra) {
+            let extra = { ...item.extra }
+            extra[key] = value
+            item.extra = extra
+          } else {
+            item[key] = value
+          }
+          return item
         }
         return item
       })
+      this.setControls(controls)
     },
-    handleTransform(newTransform, handleType) {
-      this.controlled = { ...this.controlled, ...newTransform }
-      // 仅在结束时将数据同步
-      if (['resizeend', 'dragend', 'rotateend'].includes(handleType)) {
-        this.updateControlValue(this.currentId, 'transform', newTransform)
+    // 组件拖拽时将新的transform同步到属性编辑器中，并在end事件中进行一次数据同步
+    handleTransform({ transform, type }) {
+      this.controlled = { ...this.controlled, ...transform }
+      if (['resizeend', 'dragend', 'rotateend'].includes(type)) {
+        this.updateControlValue(this.currentId, 'transform', transform)
       }
     },
     updateControlStatus(id) {
-      this.controls = this.controls.map((item) => {
+      let controls = this.controls.map((item) => {
         if (item.id == id) {
           return { ...item, active: true }
         } else if (item.active) {
@@ -110,215 +86,116 @@ export default {
         }
         return item
       })
+      this.setControls(controls)
     },
-    beforeActive(id) {
-      let control = this.controls.find((item) => item.id === id)
-      this.controlled = { ...control, ...control.transform, active: true }
-      this.currentId = id
-      this.updateControlStatus(id)
-      return true
+    //  组件选中，需要将之前选中的组件设置为未选中状态
+    handleSelect(control) {
+      // 深度拷贝数据，避免数据引用污染
+      control = JSON.parse(JSON.stringify(control))
+      Object.assign(control, control.transform, { active: true })
+      this.controlled = control
+      this.currentId = control.id
+      this.updateControlStatus(control.id)
     },
-    handleSelect(value) {
-      this.list = this.list.map((item) => {
-        if (item.id == value.id) {
-          return { ...item, num: item.num + 1 }
-        }
-        return item
-      })
-    },
-    handleChange(e) {
-      let type = e.target.dataset.type
-      let name = e.target.dataset.name
-      this.controlled[name] = e.target.value
+
+    // 属性编辑器变化后同步到组件中
+    handleChange({ type, name, value, checked, extra }) {
+      if (extra) {
+        this.controlled.extra[name] = value
+      } else {
+        this.controlled[name] = value
+      }
+
       // 注意节流优化提升性能
-      this.updateControlValue(this.currentId, name, type === 'checkbox' ? e.target.checked : +e.target.value)
+      this.updateControlValue(this.currentId, name, type === 'checkbox' ? checked : value, extra)
     },
+
+    // Actions
+    handleUndo() {
+      if (historys.length == 0) return
+      let last = historys.pop()
+      redoHistorys.push(last)
+      this.controls = historys[historys.length - 1] || []
+    },
+    handleDelete() {
+      if (!this.currentId) {
+        return
+      }
+      let controls = this.controls.filter((item) => item.id !== this.currentId)
+      this.setControls(controls)
+    },
+    handleClear() {
+      this.setControls([])
+    },
+    handleRedo() {
+      if (redoHistorys.length === 0) return
+      this.setControls(redoHistorys.pop())
+    },
+
+    setControls(controls) {
+      this.controls = controls
+      historys.push(this.controls)
+    },
+  },
+  created() {
+    // 使用独立的事件对象来处理，避免多层透传回调函数
+    this.eventbus.$on(EVENT_COMPONENT_ADD, this.addControl)
+    this.eventbus.$on(EVENT_COMPONENT_SELECT, this.handleSelect)
+    this.eventbus.$on(EVENT_COMPONENT_TRANSFORM, this.handleTransform)
   },
   render() {
     return (
-      <div id="app">
-        <div class="columns">
-          <h1 class="header">
-            <span>轻量级无依赖、可拖拽、缩放、旋转的vue组件</span>
-            <span>
-              渲染 <strong>20</strong> 个组件 选中第{this.currentId}个
-            </span>
-            <button class="button" onClick={this.addControl}>
-              添加控件
-            </button>
-          </h1>
-          <ControlsWrapperVue
-            onTransform={this.handleTransform}
-            beforeActive={this.beforeActive}
-            value={this.controls}
-          />
-          <footer class="footer">
-            <a target="_blank" href="https://zuimeiaj.github.io/yoyoo/">
-              可视化编辑器
-            </a>
-            <a target="_blank" href="https://vivw.org/">
-              前端社区
-            </a>
-            <a target="_blank" href="https://github.com/zuimeiaj/yoyoo-ddr">
-              Github
-            </a>
-          </footer>
+      <div class="app">
+        <HeaderVue
+          onUndo={this.handleUndo}
+          onRedo={this.handleRedo}
+          onClear={this.handleClear}
+          onDelete={this.handleDelete}
+        />
+        <div class="content">
+          <ComponentsVue />
+          <EditorViewVue value={this.controls} />
+          <PropInspectorVue onChange={this.handleChange} controlled={this.controlled} />
         </div>
-        <div class="inspector">
-          {this.inputs.map((item) => {
-            return (
-              <div class="input-item" key={item.name}>
-                <label class="input-label">{item.name}</label>
-                <input
-                  data-type={item.type}
-                  data-name={item.name}
-                  onInput={this.handleChange}
-                  class="input-value"
-                  type={item.type}
-                  checked={this.controlled[item.name]}
-                  value={this.controlled[item.name]}
-                />
-              </div>
-            )
-          })}
-        </div>
+        <FooterVue />
       </div>
     )
   },
 }
 </script>
 
-<style>
+<style lang="less">
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-  display: flex;
-  height: 100vh;
-}
-
-.button {
-  padding: 6px 24px;
-  font-size: 14px;
-
-  border: 1px solid #d3d3d3;
-  color: #353535;
-}
-.button:hover {
-  background: #ccc;
-}
-.columns {
+.app {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  height: 100vh;
 }
-
-.columns .header {
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.1);
-  height: 60px;
-  line-height: 60px;
-  padding-left: 25px;
-  font-size: 14px;
-  font-weight: 400;
-  color: #333;
+.content {
   display: flex;
-  justify-content: space-between;
-}
-
-.columns .content {
   flex: 1;
-  position: relative;
-  overflow: hidden;
+  height: 0;
+  .vs-editor {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
 }
-
-.cell {
-  position: absolute;
-  background: #f5f5f5;
-  border: 1px solid #d3d3d3;
+.component-impl,
+.match-parent {
   width: 100%;
   height: 100%;
-  cursor: move;
-  user-select: none;
-  font-size: 10px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: block;
 }
-
-.inspector {
-  width: 260px;
-  height: 100%;
-  background: #fff;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.1);
-}
-
-.input-item {
+.input-has-label {
   display: flex;
-  padding: 0px 10px;
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-.input-item input {
-  padding-left: 8px;
-  height: 24px;
-  font-size: 14px;
-  border-radius: 0;
-  border: 1px solid #d3d3d3;
-}
-
-.input-label {
-  flex: 1;
-}
-
-.input-value {
-  display: inline-block;
-  width: 120px;
-}
-
-.footer {
-  font-size: 14px;
-  font-weight: bold;
-  padding: 15px 15px;
-  padding-left: 10px;
-}
-
-.footer a {
-  margin-right: 20px;
-  color: #666;
-  text-decoration: none;
-}
-
-@media screen and (max-width: 600px) {
-  .footer a {
-    color: #989898;
-    text-decoration: none;
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  .inspector {
-    width: 140px;
-  }
-
-  .input-item {
-    padding: 0 5px;
-  }
-
-  .input-label {
-    font-size: 14px;
-  }
-
-  .input-value {
-    font-size: 14px;
-    width: 70px;
+  align-items: center;
+  input {
+    margin-right: 6px;
   }
 }
 </style>
