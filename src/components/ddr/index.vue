@@ -85,6 +85,9 @@ export default {
       transform: Object.assign({}, this.value),
       currentRatio: 1,
       isInitialRatio: false,
+      isDragging: false,
+      isResizing: false,
+      isRatating: false,
     }
   },
   created() {
@@ -194,12 +197,15 @@ export default {
     },
     handleMouseMove(event) {
       if (this._handlerType === 'resize') {
+        this.isResizing = true
         this.handleResizeMove(event)
         this.$emit('resize', event, this.transform)
       } else if (this._handlerType === 'drag' && this.draggable) {
+        this.isDragging = true
         this.doMove(event)
         this.$emit('drag', event, this.transform)
       } else if (this._handlerType === 'rotate') {
+        this.isRatating = true
         this.handleRotateMove(event)
         this.$emit('rotate', event, this.transform)
       }
@@ -263,6 +269,9 @@ export default {
         rotate: 'rotatable',
       }
       this.isInitialRatio = false
+      this.isDragging = false
+      this.isResizing = false
+      this.isRatating = false
       this[ev[this._handlerType]] && this.$emit(this._handlerType + 'end', event, this.transform)
     },
     handleResizeStart(event) {
@@ -400,17 +409,24 @@ export default {
     },
   },
   render() {
+    const ddrClassNames = ['yoyoo-ddr']
+
+    if (this.active) ddrClassNames.push('active')
+    if (this.isDragging) ddrClassNames.push('ddr-dragging')
+    if (this.isResizing) ddrClassNames.push('ddr-resizing')
+    if (this.isRatating) ddrClassNames.push('ddr-ratating')
+
     return (
       <div
         ref="wrapper"
         style={this.style}
-        class={`yoyoo-ddr ${this.active ? 'active' : ''}`}
+        class={ddrClassNames}
         onTouchstart={this.handleMouseDown}
         onMousedown={this.handleMouseDown}
       >
         {this.renderContent ? this.renderContent(this) : this.$slots.default}
         {this.resizable && (
-          <div>
+          <div class="resize-handler-wrapper">
             {this.resizeHandler.map((item) => {
               return (
                 <span
@@ -430,7 +446,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .yoyoo-ddr {
   position: absolute;
 }
