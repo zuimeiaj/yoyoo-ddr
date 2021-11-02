@@ -216,4 +216,23 @@ export default {
     margin-right: 6px;
   }
 }
+// 自定义class样式
+.yoyoo-ddr.ddr-dragging {
+  &.active {
+    border: 1px solid #ff0000;
+  }
+  .resize-handler-wrapper,
+  .rotate-handler {
+    display: none;
+  }
+}
+.yoyoo-ddr.ddr-ready-dragging {
+  &.active {
+    border: 1px solid #ff0000;
+  }
+  .resize-handler-wrapper,
+  .rotate-handler {
+    display: none;
+  }
+}
 </style>

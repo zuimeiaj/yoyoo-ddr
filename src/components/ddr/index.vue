@@ -87,7 +87,10 @@ export default {
       isInitialRatio: false,
       isDragging: false,
       isResizing: false,
-      isRatating: false,
+      isRotating: false,
+      isReadyToDrag: false,
+      isReadyToResize: false,
+      isReadyToRotate: false,
     }
   },
   created() {
@@ -184,18 +187,24 @@ export default {
       document.addEventListener('mouseup', this.handleMouseUp, false)
       if (event.target.dataset.type === 'rotate') {
         this._handlerType = 'rotate'
+        this.isReadyToRotate = true
         this.handleRotateStart(event)
         this.$emit('rotatestart', event, this.transform)
       } else if (this._activeTarget.dataset.resizetype) {
         this._handlerType = 'resize'
+        this.isReadyToResize = true
         this.handleResizeStart(event)
         this.$emit('resizestart', event, this.transform)
       } else {
         this._handlerType = 'drag'
+        this.isReadyToDrag = true
         this.draggable && this.$emit('dragstart', event, this.transform)
       }
     },
     handleMouseMove(event) {
+      this.isReadyToDrag = false
+      this.isReadyToResize = false
+      this.isReadyToRotate = false
       if (this._handlerType === 'resize') {
         this.isResizing = true
         this.handleResizeMove(event)
@@ -205,7 +214,7 @@ export default {
         this.doMove(event)
         this.$emit('drag', event, this.transform)
       } else if (this._handlerType === 'rotate') {
-        this.isRatating = true
+        this.isRotating = true
         this.handleRotateMove(event)
         this.$emit('rotate', event, this.transform)
       }
@@ -263,15 +272,15 @@ export default {
       document.removeEventListener('mouseup', this.handleMouseUp, false)
       document.removeEventListener('touchmove', this.handleMouseMove, false)
       document.removeEventListener('touchend', this.handleMouseUp, false)
+
       let ev = {
         drag: 'draggable',
         resize: 'resizable',
         rotate: 'rotatable',
       }
-      this.isInitialRatio = false
-      this.isDragging = false
-      this.isResizing = false
-      this.isRatating = false
+
+      this.isInitialRatio = this.isDragging = this.isResizing = this.isRotating = false
+      this.isReadyToDrag = this.isReadyToResize = this.isReadyToRotate = false
       this[ev[this._handlerType]] && this.$emit(this._handlerType + 'end', event, this.transform)
     },
     handleResizeStart(event) {
@@ -407,20 +416,25 @@ export default {
       r = r < 0 ? r + 360 : r
       this.transform.rotation = Math.floor(r)
     },
+    getClassNames() {
+      const ddrClassNames = ['yoyoo-ddr']
+
+      if (this.active) ddrClassNames.push('active')
+      if (this.isDragging) ddrClassNames.push('ddr-dragging')
+      if (this.isResizing) ddrClassNames.push('ddr-resizing')
+      if (this.isRotating) ddrClassNames.push('ddr-rotating')
+      if (this.isReadyToDrag) ddrClassNames.push('ddr-ready-drag')
+      if (this.isReadyToResize) ddrClassNames.push('ddr-ready-resize')
+      if (this.isReadyToRotate) ddrClassNames.push('ddr-ready-rotate')
+      return ddrClassNames
+    },
   },
   render() {
-    const ddrClassNames = ['yoyoo-ddr']
-
-    if (this.active) ddrClassNames.push('active')
-    if (this.isDragging) ddrClassNames.push('ddr-dragging')
-    if (this.isResizing) ddrClassNames.push('ddr-resizing')
-    if (this.isRatating) ddrClassNames.push('ddr-ratating')
-
     return (
       <div
         ref="wrapper"
         style={this.style}
-        class={ddrClassNames}
+        class={this.getClassNames()}
         onTouchstart={this.handleMouseDown}
         onMousedown={this.handleMouseDown}
       >
