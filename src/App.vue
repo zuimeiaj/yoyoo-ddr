@@ -40,6 +40,8 @@ export default {
           parent: false,
           resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
           extra: item,
+          grid: [10, 10],
+          axis: 'xy',
         }))
       )
       this.setControls(controls)
@@ -219,7 +221,8 @@ export default {
 // 自定义class样式
 .yoyoo-ddr.ddr-dragging {
   &.active {
-    border: 1px solid #ff0000;
+    border: 1px solid blue;
+    border-radius: 2px;
   }
   .resize-handler-wrapper,
   .rotate-handler {

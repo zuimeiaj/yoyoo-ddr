@@ -65,6 +65,8 @@ export default {
     let item = this.item
     return (
       <DragCell
+        grid={item.grid}
+        axis={item.axis}
         key={item.id}
         id={item.id}
         draggable={item.draggable}
