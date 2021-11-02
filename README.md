@@ -1,24 +1,35 @@
-
 ### 安装
 
 ```
 npm i yoyoo-ddr --save
+
 ```
 
 ### 更新日志
 
-优化大数组渲染时的性能问题
+### [ v0.5 ] - 2021-11-02
+
+增加新的功能
+
+- 新增组件在各个状态时的 class，方便定义不同状态下的样式
+- 移除了组件 style 标签的 scoped 标识，方便外部自定义样式
+- 新增 axis 属性，可选值为 x 或者 y，默认为 xy。该属性仅支持拖动
+- 新增 grid 属性，格式为[x,y]，默认为[1,1]。该属性支持拖动和缩放
 
 ### [ v0.4.1] - 2021-10-30
 
-- 修改事件名称改为全小写 ，例如 dragStart 修改为 dragstart，使用render函数时用onDragstart监听事件。
+修改 render 函数下不能正确触发事件
+
+- 修改事件名称改为全小写 ，例如 dragStart 修改为 dragstart，使用 render 函数时用 onDragstart 监听事件。
 
 ### [ v0.4 ] - 2021-09-09
 
-- 添加ID参数，配合数组渲染时使用beforeActive获取当前选中的组件
-- 添加 beforeActive 函数参数。 此函数传入组件 ID 并返回一个布尔值。 当返回值为true时，组件会忽略active属性，让组件立即可用
-- 添加renderContent函数参数，单个组件渲染时可以直接用slot的方式，数组渲染时建议使用该函数返回子节点
-- 将template 改为render方式
+优化大数组渲染时的性能问题
+
+- 添加 ID 参数，配合数组渲染时使用 beforeActive 获取当前选中的组件
+- 添加 beforeActive 函数参数。 此函数传入组件 ID 并返回一个布尔值。 当返回值为 true 时，组件会忽略 active 属性，让组件立即可用
+- 添加 renderContent 函数参数，单个组件渲染时可以直接用 slot 的方式，数组渲染时建议使用该函数返回子节点
+- 将 template 改为 render 方式
 
 ### 使用
 
@@ -101,7 +112,7 @@ export default {
 
 参数 id、beforeActive、renderContent是专为大数组渲染时提供的
 
-</DDR> 
+</DDR>
 ```
 
 ### 特色
@@ -112,33 +123,31 @@ export default {
 ### 注意事项
 
 - 如果使用了 `transform:scale(2)` 会导致位置不对问题
-- 基于vue 2 开发，不支持vue3
-- parent属性目前仅支持拖拽
-- 父容器如果使用了overflow scroll 也会导致拖拽位置问题
-
+- 基于 vue 2 开发，不支持 vue3
+- parent 属性目前仅支持拖拽
+- 父容器如果使用了 overflow scroll 也会导致拖拽位置问题
 
 ### 属性
 
-| 名称          | 类型      | 默认值                                      | 描述                                                                           |
-| ------------- | -------- | ----------------------------------------- | ----------------------------------------------------------------------------------------
-| draggable     | boolean  | true                                      | 是否可拖拽                                                                       |
-| rotatable     | boolean  | true                                      | 是否可旋转                                                                       |
-| resizable     | boolean  | true                                      | 是否可缩放                                                                       |
-| active        | boolean  | true                                      | 是否可用，                                                                       |
-| acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                      |
+| 名称          | 类型     | 默认值                                    | 描述                                                                                 |
+| ------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| draggable     | boolean  | true                                      | 是否可拖拽                                                                           |
+| rotatable     | boolean  | true                                      | 是否可旋转                                                                           |
+| resizable     | boolean  | true                                      | 是否可缩放                                                                           |
+| active        | boolean  | true                                      | 是否可用，                                                                           |
+| acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                    |
 | parent        | boolean  | false                                     | 限制在父容器内拖拽，仅拖拽时才会判断                                                 |
-| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                    |
-| minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                  |
-| minHeight     | number   | 1                                         | 可缩放最小高度                                                                    |
-| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持v-model，但能响应value的更新                       |
-| id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                    |
-| beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入id                              |
-| renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot就行了           |
+| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                       |
+| minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                     |
+| minHeight     | number   | 1                                         | 可缩放最小高度                                                                       |
+| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持 v-model，但能响应 value 的更新                |
+| id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                   |
+| beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入 id                        |
+| renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot 就行了 |
 
 ### 事件
 
 拖拽、旋转、缩放时会触发一系列事件，该事件都会传入两个参数，第一个参数为原始的事件对象，第二个参数为当前组件的位置信息。
-
 
 | name        | args                          |
 | ----------- | ----------------------------- |
@@ -151,12 +160,12 @@ export default {
 | resizestart | (event,transform)=>{} :void 0 |
 | resize      | (event,transform)=>{} :void 0 |
 | resizeend   | (event,transform)=>{} :void 0 |
-  
+
 ### 链接
 
- [ 在线演示 https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
+[ 在线演示 https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
 
- [ 设计工具，使用react实现的 http://zuimeiaj.github.io/yoyoo/](http://zuimeiaj.github.io/yoyoo/)
+[ 设计工具，使用 react 实现的 http://zuimeiaj.github.io/yoyoo/](http://zuimeiaj.github.io/yoyoo/)
 
 ### License
 
