@@ -73,7 +73,7 @@ export default {
     },
     grid: {
       type: Array,
-      default: () => [10, 10],
+      default: () => [1, 1],
     },
     axis: {
       type: String,

@@ -141,9 +141,18 @@ export default {
 | minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                     |
 | minHeight     | number   | 1                                         | 可缩放最小高度                                                                       |
 | value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持 v-model，但能响应 value 的更新                |
+| grid          | Array    | [1,1]                                     | 格式[x,y]，支持拖动和缩放对齐。只能为整数                                            |
+| axis          | String   | 'xy'                                      | 指定坐标轴拖动，默认 xy 都可以拖动，仅支持拖动                                       |
 | id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                   |
 | beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入 id                        |
 | renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot 就行了 |
+
+### 各个状态下的 class 定义
+
+- 拖动： `ddr-ready-drag` 鼠标按下,准备拖动时的 class。`ddr-dragging` 拖动时的 class
+- 缩放： `ddr-ready-resize` 鼠标按下，准备缩放时的 class。`ddr-resizing` 缩放时的 class
+- 旋转： `ddr-ready-rotate` 鼠标按下，准备旋转时的 class。`ddr-rotating` 旋转时的 class
+- 选中： `active` 组件选中时的 class
 
 ### 事件
 
