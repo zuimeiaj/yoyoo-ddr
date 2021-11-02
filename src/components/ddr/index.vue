@@ -75,6 +75,10 @@ export default {
       type: Array,
       default: () => [10, 10],
     },
+    axis: {
+      type: String,
+      default: 'yx', // x | y 不填写则都可以移动，仅移动时生效
+    },
   },
   data() {
     return {
@@ -221,16 +225,20 @@ export default {
       // 将当前位置对齐网格
       // 当deltaX > 0 说明当前移动方向为向右移动，则向下取整。例如：10 12 14 始终取 10
       // 当deltaY < 0 说明当干移动方向为向左移动，则向上取整。例如：20 19 17 始终取 20
-      if (deltaX > 0) {
-        this.transform.x = x - (x % gridX)
-      } else if (deltaX < 0) {
-        this.transform.x = x - ((x % gridX) - gridX)
+      if (this.axis.includes('x')) {
+        if (deltaX > 0) {
+          this.transform.x = x - (x % gridX)
+        } else if (deltaX < 0) {
+          this.transform.x = x - ((x % gridX) - gridX)
+        }
       }
 
-      if (deltaY > 0) {
-        this.transform.y = y - (y % gridY)
-      } else if (deltaY < 0) {
-        this.transform.y = y - ((y % gridY) - gridY)
+      if (this.axis.includes('y')) {
+        if (deltaY > 0) {
+          this.transform.y = y - (y % gridY)
+        } else if (deltaY < 0) {
+          this.transform.y = y - ((y % gridY) - gridY)
+        }
       }
     },
     /**
