@@ -16,12 +16,12 @@ export const pointMap = {
 // 计算矩形大小时使用四个直角坐标
 export const pointMap2 = {
   br: 0,
-  tr: 6,
-  tl: 4,
-  bl: 2,
-  tm: 4,
   bm: 0,
+  bl: 2,
   l: 2,
+  tl: 4,
+  tm: 4,
+  tr: 6,
   r: 6,
 }
 

@@ -24,8 +24,8 @@ export default {
             .toString()
             .slice(2, 10),
           transform: {
-            x: item.x,
-            y: item.y,
+            x: item.x - (item.x % 10),
+            y: item.y - (item.y % 10),
             width: item.width,
             height: item.height,
             rotation: 0,

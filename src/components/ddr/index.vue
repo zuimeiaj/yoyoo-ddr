@@ -71,6 +71,10 @@ export default {
     renderContent: {
       type: Function,
     },
+    grid: {
+      type: Array,
+      default: () => [10, 10],
+    },
   },
   data() {
     return {
@@ -155,8 +159,9 @@ export default {
       this._lastY = clientY
       this._activeTarget = event.target
       this._parentRect = this.$refs.wrapper.parentNode.getBoundingClientRect()
-      this.localeTransform = this.transform
-      // Get the movable boundary of the element in the parent element
+      this.localeTransform = { ...this.transform }
+      // 如果设置了限制在父元素的边界内移
+      // 计算组件的边界，在移动时进行判断并修正
       if (this.parent) {
         let mouseDownRect = getBoundingRect(this.transform)
         let minLeft = this.transform.x - mouseDownRect.left
@@ -165,6 +170,7 @@ export default {
         let maxTop = this._parentRect.height - this.transform.height - minTop
         this.minBoundary = { minLeft, maxLeft, minTop, maxTop }
       }
+      // 添加事件，该事件会在up时移除
       document.addEventListener('mousemove', this.handleMouseMove, false)
       document.addEventListener('touchmove', this.handleMouseMove, false)
       document.addEventListener('touchend', this.handleMouseUp, false)
@@ -196,26 +202,47 @@ export default {
     },
     doMove(event) {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
+      let [gridX, gridY] = this.grid
+
       let deltaX = clientX - this._lastX
       let deltaY = clientY - this._lastY
       this._lastX = clientX
       this._lastY = clientY
+      let x = (this.localeTransform.x = Math.round(this.localeTransform.x + deltaX))
+      let y = (this.localeTransform.y = Math.round(this.localeTransform.y + deltaY))
+      // 限制在父元素内进行移动
+      // 在鼠标按下准备移动时会先计算好当前组件的边界，当超出边界时取计算好的边界进行修正
       if (this.parent) {
-        this.localeTransform.x += deltaX
-        this.localeTransform.y += deltaY
-        this.restrictToParentBoundary()
-      } else {
-        this.transform.x = Math.round(this.transform.x + deltaX)
-        this.transform.y = Math.round(this.transform.y + deltaY)
+        let bounds = this.restrictToParentBoundary()
+        x = bounds.x
+        y = bounds.y
+      }
+
+      // 将当前位置对齐网格
+      // 当deltaX > 0 说明当前移动方向为向右移动，则向下取整。例如：10 12 14 始终取 10
+      // 当deltaY < 0 说明当干移动方向为向左移动，则向上取整。例如：20 19 17 始终取 20
+      if (deltaX > 0) {
+        this.transform.x = x - (x % gridX)
+      } else if (deltaX < 0) {
+        this.transform.x = x - ((x % gridX) - gridX)
+      }
+
+      if (deltaY > 0) {
+        this.transform.y = y - (y % gridY)
+      } else if (deltaY < 0) {
+        this.transform.y = y - ((y % gridY) - gridY)
       }
     },
+    /**
+     * 限制在父元素中移动
+     * @returns {{x:number;y:number}}
+     */
     restrictToParentBoundary() {
       let x = Math.max(this.minBoundary.minLeft, this.localeTransform.x)
       let y = Math.max(this.minBoundary.minTop, this.localeTransform.y)
       x = Math.min(this.minBoundary.maxLeft, x)
       y = Math.min(this.minBoundary.maxTop, y)
-      this.transform.x = Math.round(x)
-      this.transform.y = Math.round(y)
+      return { x, y }
     },
     handleMouseUp(event) {
       document.removeEventListener('mousemove', this.handleMouseMove, false)
@@ -235,7 +262,11 @@ export default {
       let rect = this.transform
       let matrix = getPoints(rect)
       let pressAngle
+      // 当前控制点的对角坐标点，该坐标会用来计算新的位置
+      // 例如：bottomRight(右下角) 对应 topLeft(左上角)
       let opposite = matrix[pointMap[type]]
+      // 与上面的区别是，这里的对角坐标只能是4个直角坐标，用于计算新的宽高
+      // 例如：例如：bottomRight 和 bottom 都对应 topLeft
       let opp2 = matrix[pointMap2[type]]
       let { clientX, clientY } = event.touches ? event.touches[0] : event
       let x1 = clientX - this._parentRect.left - opp2.x
@@ -263,19 +294,21 @@ export default {
     handleResizeMove(event) {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
       let { opposite, opp2, type, pressAngle, startAngle } = this._resizeOpt
-      let x = clientX - this._parentRect.left - opp2.x,
-        y = clientY - this._parentRect.top - opp2.y,
-        dis = Math.hypot(y, x)
+      let x = clientX - this._parentRect.left - opp2.x
+      let y = clientY - this._parentRect.top - opp2.y
+      let dis = Math.hypot(y, x)
       let ratio = event.shiftKey || this.acceptRatio
+      let [gridX, gridY] = this.grid
+      // 锁定纵横比
       if (!this.isInitialRatio && ratio) {
         this.currentRatio = this.transform.width / this.transform.height
         this.isInitialRatio = true
       }
-
       if (!ratio) {
         this.isInitialRatio = false
       }
 
+      // 获取新的宽度和高度
       let { w, h } = getSize({
         type,
         dis,
@@ -284,13 +317,17 @@ export default {
         startAngle,
         pressAngle,
       })
-      let transform = Object.assign({}, this.transform)
+      let transform = { ...this.localeTransform }
+
+      // 进行等比例缩放
       if (this.isInitialRatio) {
         if (widthMap[type]) h = w / this.currentRatio
         else w = h * this.currentRatio
       }
       w = Math.max(Math.round(w), this.minWidth)
       h = Math.max(Math.round(h), this.minHeight)
+
+      // 判断当前控制点是否为宽度缩放还是高度缩放
       if (widthMap[type] && !ratio) {
         transform.width = w
       } else if (heightMap[type] && !ratio) {
@@ -300,32 +337,55 @@ export default {
         transform.height = h
       }
 
+      // 限制在网格中移动，原理同拖动
+      if (transform.width % gridX > 0) {
+        if (transform.width > this.localeTransform.width) {
+          // 宽度变大时向下取整
+          transform.width = transform.width - (transform.width % gridX)
+        } else {
+          // 宽度变小时向上取整
+          transform.width = transform.width - ((transform.width % gridX) - gridX)
+        }
+      }
+      // 原理同上
+      if (transform.height % gridY > 0) {
+        if (transform.height > this.localeTransform.height) {
+          transform.height = transform.height - (transform.height % gridY)
+        } else {
+          transform.height = transform.height - ((transform.height % gridY) - gridY)
+        }
+      }
+
+      // 根据新的旋转和宽高计算新的位置
       let matrix = getPoints(transform)
-      let _opp = matrix[pointMap[type]]
-      let deltaX = -(_opp.x - opposite.x),
-        deltaY = -(_opp.y - opposite.y)
+      let newOpposite = matrix[pointMap[type]]
+      let deltaX = -(newOpposite.x - opposite.x)
+      let deltaY = -(newOpposite.y - opposite.y)
       transform.x = Math.round(transform.x + deltaX)
       transform.y = Math.round(transform.y + deltaY)
-
       this.transform = transform
     },
+
     handleRotateStart(event) {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let t = this.$refs.wrapper.getBoundingClientRect(),
-        cx = t.left + t.width / 2,
-        cy = t.top + t.height / 2,
-        startAngle = (180 / Math.PI) * Math.atan2(clientY - cy, clientX - cx),
-        rotation = this.transform.rotation
+      let t = this.$refs.wrapper.getBoundingClientRect()
+      let cx = t.left + t.width / 2
+      let cy = t.top + t.height / 2
+      let startAngle = (180 / Math.PI) * Math.atan2(clientY - cy, clientX - cx)
+      let rotation = this.transform.rotation
+      // 记录旋转的角度和组件的中心点
       this._rotateOpt = { cx, cy, startAngle, rotation }
     },
     handleRotateMove(event) {
       let { cx, cy, startAngle, rotation } = this._rotateOpt
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let x = clientX - cx,
-        y = clientY - cy,
-        angle = (180 / Math.PI) * Math.atan2(y, x),
-        currentAngle = angle - startAngle,
-        r = rotation + currentAngle
+      let x = clientX - cx
+      let y = clientY - cy
+      let angle = (180 / Math.PI) * Math.atan2(y, x)
+      // 旋转角度 = 鼠标移动时角度 - 鼠标按下时角度
+      // 旋转后的角度 = 组件按下时角度 + 旋转角度
+      let currentAngle = angle - startAngle
+      let r = rotation + currentAngle
       r = r % 360
       r = r < 0 ? r + 360 : r
       this.transform.rotation = Math.floor(r)
