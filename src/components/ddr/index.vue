@@ -474,53 +474,42 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less">
 .yoyoo-ddr {
   position: absolute;
-}
+  .resize-handler.tm {
+    left: 50%;
+  }
+  .resize-handler.r {
+    top: 50%;
+  }
+  .resize-handler.bm {
+    left: 50%;
+  }
+  .resize-handler.l {
+    top: 50%;
+    cursor: pointer;
+  }
 
-.yoyoo-ddr .resize-handler,
-.yoyoo-ddr .rotate-handler {
-  display: none;
-}
-
-.yoyoo-ddr.active {
-  border: 1px dashed #607d8b;
-}
-
-.yoyoo-ddr.active .resize-handler,
-.yoyoo-ddr.active .rotate-handler {
-  display: inline-block;
-}
-
-.resize-handler,
-.rotate-handler {
-  position: absolute;
-  border: 1px solid #607d8b;
-  background: #fff;
-  box-sizing: border-box;
-  border-radius: 50%;
-}
-
-.resize-handler.tm {
-  left: 50%;
-}
-
-.resize-handler.r {
-  top: 50%;
-}
-
-.resize-handler.bm {
-  left: 50%;
-}
-
-.resize-handler.l {
-  top: 50%;
-  cursor: pointer;
-}
-
-.rotate-handler {
-  left: 50%;
-  cursor: crosshair;
+  .resize-handler,
+  .rotate-handler {
+    display: none;
+    position: absolute;
+    border: 1px solid #607d8b;
+    background: #fff;
+    box-sizing: border-box;
+    border-radius: 50%;
+  }
+  .rotate-handler {
+    left: 50%;
+    cursor: crosshair;
+  }
+  &.active {
+    border: 1px dashed #607d8b;
+    > .resize-handler-wrapper > .resize-handler,
+    > .rotate-handler {
+      display: inline-block;
+    }
+  }
 }
 </style>

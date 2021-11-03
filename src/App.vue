@@ -4,6 +4,7 @@ import EditorViewVue from './examples/vseditor/editor-view.vue'
 import { EVENT_COMPONENT_ADD, EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './examples/vseditor/event-enums'
 import FooterVue from './examples/vseditor/footer.vue'
 import HeaderVue from './examples/vseditor/header.vue'
+import { findComponentPathById, updateTreeIn } from './examples/utils'
 import PropInspectorVue from './examples/vseditor/prop-inspector.vue'
 const historys = []
 const redoHistorys = []
@@ -13,60 +14,69 @@ export default {
     return {
       controls: [],
       currentId: '',
+      currentPath: [],
       controlled: {},
     }
   },
   methods: {
-    addControl(components) {
-      let controls = this.controls.concat(
-        components.map((item) => ({
-          id: Math.random()
-            .toString()
-            .slice(2, 10),
-          transform: {
-            x: item.x - (item.x % 10),
-            y: item.y - (item.y % 10),
-            width: item.width,
-            height: item.height,
-            rotation: 0,
-          },
-          minHeight: 10,
-          minWidth: 10,
-          rotatable: true,
-          resizable: true,
-          draggable: true,
-          acceptRatio: false,
-          active: false,
-          parent: true,
-          resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
-          extra: item,
-          grid: [10, 10],
-          axis: 'xy',
-        }))
-      )
+    getComponents(components) {
+      return components.map((item) => ({
+        type: item.type,
+        children: item.type === 'container' ? [] : void 0,
+        id: Math.random()
+          .toString()
+          .slice(2, 10),
+        transform: {
+          x: item.x - (item.x % 10),
+          y: item.y - (item.y % 10),
+          width: item.width,
+          height: item.height,
+          rotation: 0,
+        },
+        minHeight: 10,
+        minWidth: 10,
+        rotatable: true,
+        resizable: true,
+        draggable: true,
+        acceptRatio: false,
+        active: false,
+        parent: true,
+        resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
+        extra: item,
+        grid: [10, 10],
+        axis: 'xy',
+      }))
+    },
+    addControl({ components, parentId }) {
+      let controls = []
+      if (parentId) {
+        const { path } = findComponentPathById(this.controls, parentId)
+        controls = updateTreeIn(this.controls, path, (item) => {
+          item.children = item.children.concat(this.getComponents(components))
+          return item
+        })
+      } else {
+        controls = this.controls.concat(this.getComponents(components))
+      }
+
       this.setControls(controls)
       // 默认选中最后一个
       this.handleSelect(controls[controls.length - 1])
     },
 
-    updateControlValue(id, key, value, extra) {
-      let controls = this.controls.map((item) => {
-        if (item.id === id) {
-          item = { ...item }
-          if (['x', 'y', 'width', 'height', 'rotation'].includes(key)) {
-            let transform = { ...item.transform }
-            transform[key] = value
-            item.transform = transform
-            return item
-          }
-          if (extra) {
-            let extra = { ...item.extra }
-            extra[key] = value
-            item.extra = extra
-          } else {
-            item[key] = value
-          }
+    updateControlValue(key, value, isExtra) {
+      let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
+        if (['x', 'y', 'width', 'height', 'rotation'].includes(key)) {
+          let transform = { ...item.transform }
+          transform[key] = value
+          item.transform = transform
           return item
+        } else if (isExtra) {
+          let extra = { ...item.extra }
+          extra[key] = value
+          item.extra = extra
+        } else {
+          item[key] = value
         }
         return item
       })
@@ -76,37 +86,47 @@ export default {
     handleTransform({ transform, type }) {
       this.controlled = { ...this.controlled, ...transform }
       if (['resizeend', 'dragend', 'rotateend'].includes(type)) {
-        this.updateControlValue(this.currentId, 'transform', transform)
+        this.updateControlValue('transform', transform, false)
       }
     },
-    updateControlStatus(id) {
-      let controls = this.controls.map((item) => {
-        if (item.id == id) {
-          return { ...item, active: true }
-        } else if (item.active) {
-          return { ...item, active: false }
-        }
+    updateControlStatus() {
+      let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
+        item.active = true
         return item
       })
+
       this.setControls(controls)
     },
-    //  组件选中，需要将之前选中的组件设置为未选中状态
+    //  组件选中，右侧展示属性编辑器
     handleSelect(control) {
       this.setCurrentControl(control)
-      this.updateControlStatus(control.id)
+      this.updateControlStatus()
     },
     setCurrentControl(control) {
+      // 将已选中的取消选中
+      if (control && this.currentId) {
+        let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
+          item.active = false
+          return item
+        })
+        this.setControls(controls)
+      }
       // 后退时可能没得了
       if (!control || !control.id) {
         this.controlled = {}
         this.currentId = ''
+        this.currentPath = []
         return
       }
+
       // 深度拷贝数据，避免数据引用污染
       control = JSON.parse(JSON.stringify(control))
       Object.assign(control, control.transform, { active: true })
       this.controlled = control
       this.currentId = control.id
+
+      let { path } = findComponentPathById(this.controls, this.currentId)
+      this.currentPath = path
     },
 
     // 属性编辑器变化后同步到组件中
@@ -116,9 +136,8 @@ export default {
       } else {
         this.controlled[name] = value
       }
-
       // 注意节流优化提升性能
-      this.updateControlValue(this.currentId, name, value, extra)
+      this.updateControlValue(name, value, extra)
     },
     getActiveComponent(ctls) {
       return ctls.find((item) => item.active)
@@ -203,6 +222,8 @@ export default {
     flex: 1;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    height: 100%;
   }
 }
 .component-impl,

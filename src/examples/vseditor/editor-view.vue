@@ -4,10 +4,13 @@ import { EVENT_COMPONENT_ADD } from './event-enums'
 export default {
   props: {
     value: Array,
+    parentId: String,
+    parent: Object,
   },
   methods: {
     handleDropOver(e) {
       e.preventDefault()
+      e.stopPropagation()
     },
     getImageDataUrl(file) {
       return new Promise((resolve) => {
@@ -20,13 +23,15 @@ export default {
     },
     async handleDrop(e) {
       e.preventDefault()
+      e.stopPropagation()
       // file drop
       let files = e.dataTransfer.files
       let addComponents = []
       let comstr = ''
+      let rect = this.$refs.editor.getBoundingClientRect()
       let coords = {
-        x: e.clientX - 100,
-        y: e.clientY - 50,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
       }
 
       if (files.length > 0) {
@@ -44,14 +49,15 @@ export default {
       } else if ((comstr = e.dataTransfer.getData('text/component'))) {
         let com = JSON.parse(comstr)
         com = { ...com, ...coords }
+
         addComponents.push(com)
       }
-      this.eventbus.$emit(EVENT_COMPONENT_ADD, addComponents)
+      this.eventbus.$emit(EVENT_COMPONENT_ADD, { components: addComponents, parentId: this.parentId })
     },
   },
   render() {
     return (
-      <div ondrop={this.handleDrop} ondragover={this.handleDropOver} class="vs-editor">
+      <div ref="editor" ondrop={this.handleDrop} ondragover={this.handleDropOver} class="vs-editor">
         {this.value.map((item) => {
           return <CellWrapperVue item={item} />
         })}

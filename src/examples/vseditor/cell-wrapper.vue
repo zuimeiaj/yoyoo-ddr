@@ -7,7 +7,9 @@ export default {
     item: Object,
   },
   methods: {
-    handler(event, transform) {
+    handler(e, transform) {
+      e.stopPropagation()
+      e.preventDefault()
       this.eventbus.$emit(EVENT_COMPONENT_TRANSFORM, { type: this.handleType, transform })
     },
     beforeActive1() {
@@ -56,7 +58,7 @@ export default {
       let DynamicComponent = ComponentImpl[extra.type]
       return (
         <div class="component-impl">
-          <DynamicComponent params={extra} />
+          <DynamicComponent meta={this.item} params={extra} />
         </div>
       )
     },
