@@ -1,9 +1,13 @@
 <script>
+import PropCheckInputVue from './prop-check-input.vue'
 import PropGridInputVue from './prop-grid-input.vue'
+import PropNumberInputVue from './prop-number-input.vue'
 import PropRadioInputVue from './prop-radio-input.vue'
 const PropInputImpl = {
   grid: PropGridInputVue,
   radio: PropRadioInputVue,
+  number: PropNumberInputVue,
+  checkbox: PropCheckInputVue,
 }
 export default {
   props: ['controlled'],
@@ -34,13 +38,6 @@ export default {
     }
   },
   methods: {
-    handleChange(e, item) {
-      this.$emit('change', {
-        ...item,
-        value: isNaN(e.target.value) ? +e.target.value : e.target.value,
-        checked: e.target.checked,
-      })
-    },
     customChange(e, item) {
       this.$emit('change', {
         ...item,
@@ -62,30 +59,15 @@ export default {
       <div class="vs-inspector">
         <div>DDR Props</div>
         {this.inputs.map((item) => {
-          let normalInput = (
-            <input
-              onInput={(e) => this.handleChange(e, item)}
-              class="input-value"
-              type={item.type}
-              checked={this.controlled[item.name]}
-              value={this.controlled[item.name]}
-            />
-          )
-          if (['grid', 'radio'].includes(item.type)) {
-            let DyInput = PropInputImpl[item.type]
-            normalInput = (
+          let DyInput = PropInputImpl[item.type]
+          return (
+            <div class="input-item" key={item.name}>
+              <label class="input-label">{item.name}</label>
               <DyInput
                 options={item.options}
                 value={this.controlled[item.name]}
                 onInput={(e) => this.customChange(e, item)}
               />
-            )
-          }
-
-          return (
-            <div class="input-item" key={item.name}>
-              <label class="input-label">{item.name}</label>
-              {normalInput}
             </div>
           )
         })}

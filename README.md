@@ -7,6 +7,10 @@ npm i yoyoo-ddr --save
 
 ### 更新日志
 
+### [ v0.5.2] - 2021-11-03
+
+- parent 属性支持在缩放时进行限制。但如果组件旋转角度大于 0 会忽略该属性
+
 ### [ v0.5 ] - 2021-11-02
 
 增加新的功能
@@ -136,7 +140,7 @@ export default {
 | resizable     | boolean  | true                                      | 是否可缩放                                                                           |
 | active        | boolean  | true                                      | 是否可用，                                                                           |
 | acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                    |
-| parent        | boolean  | false                                     | 限制在父容器内拖拽，仅拖拽时才会判断                                                 |
+| parent        | boolean  | false                                     | 限制在父容器内拖拽，支持拖动和缩放，旋转角度大于 0 不会判断                          |
 | resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                       |
 | minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                     |
 | minHeight     | number   | 1                                         | 可缩放最小高度                                                                       |

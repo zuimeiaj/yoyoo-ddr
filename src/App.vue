@@ -37,7 +37,7 @@ export default {
           draggable: true,
           acceptRatio: false,
           active: false,
-          parent: false,
+          parent: true,
           resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
           extra: item,
           grid: [10, 10],
@@ -110,7 +110,7 @@ export default {
     },
 
     // 属性编辑器变化后同步到组件中
-    handleChange({ type, name, value, checked, extra }) {
+    handleChange({ name, value, extra }) {
       if (extra) {
         this.controlled.extra[name] = value
       } else {
@@ -118,7 +118,7 @@ export default {
       }
 
       // 注意节流优化提升性能
-      this.updateControlValue(this.currentId, name, type === 'checkbox' ? checked : value, extra)
+      this.updateControlValue(this.currentId, name, value, extra)
     },
     getActiveComponent(ctls) {
       return ctls.find((item) => item.active)

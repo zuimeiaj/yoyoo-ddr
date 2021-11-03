@@ -169,16 +169,29 @@ export default {
       this._lastY = clientY
       this._activeTarget = event.target
       this._parentRect = this.$refs.wrapper.parentNode.getBoundingClientRect()
+      this._resizeHandler = event.target.dataset.resizetype
       this.localeTransform = { ...this.transform }
       // 如果设置了限制在父元素的边界内移
       // 计算组件的边界，在移动时进行判断并修正
       if (this.parent) {
-        let mouseDownRect = getBoundingRect(this.transform)
-        let minLeft = this.transform.x - mouseDownRect.left
-        let maxLeft = this._parentRect.width - this.transform.width - minLeft
-        let minTop = this.transform.y - mouseDownRect.top
-        let maxTop = this._parentRect.height - this.transform.height - minTop
-        this.minBoundary = { minLeft, maxLeft, minTop, maxTop }
+        let minLeft = 0
+        let maxLeft = this._parentRect.width - this.transform.width
+        let minTop = 0
+        let maxTop = this._parentRect.height - this.transform.height
+        let maxLeftWidth = this.transform.x + this.transform.width
+        let maxRightWidth = this._parentRect.width - this.transform.x
+        let maxTopHeight = this.transform.y + this.transform.height
+        let maxBottomHeight = this._parentRect.height - this.transform.y
+        this.minBoundary = {
+          minLeft,
+          maxLeft,
+          minTop,
+          maxTop,
+          maxLeftWidth,
+          maxRightWidth,
+          maxTopHeight,
+          maxBottomHeight,
+        }
       }
       // 添加事件，该事件会在up时移除
       document.addEventListener('mousemove', this.handleMouseMove, false)
@@ -202,9 +215,14 @@ export default {
       }
     },
     handleMouseMove(event) {
+      let { clientX, clientY } = event.touches ? event.touches[0] : event
       this.isReadyToDrag = false
       this.isReadyToResize = false
       this.isReadyToRotate = false
+      this._deltaX = clientX - this._lastX
+      this._deltaY = clientY - this._lastY
+      this._lastX = clientX
+      this._lastY = clientY
       if (this._handlerType === 'resize') {
         this.isResizing = true
         this.handleResizeMove(event)
@@ -219,42 +237,55 @@ export default {
         this.$emit('rotate', event, this.transform)
       }
     },
-    doMove(event) {
-      let { clientX, clientY } = event.touches ? event.touches[0] : event
+    doMove() {
       let [gridX, gridY] = this.grid
-
-      let deltaX = clientX - this._lastX
-      let deltaY = clientY - this._lastY
-      this._lastX = clientX
-      this._lastY = clientY
+      let deltaX = this._deltaX
+      let deltaY = this._deltaY
       let x = (this.localeTransform.x = Math.round(this.localeTransform.x + deltaX))
       let y = (this.localeTransform.y = Math.round(this.localeTransform.y + deltaY))
-      // 限制在父元素内进行移动
-      // 在鼠标按下准备移动时会先计算好当前组件的边界，当超出边界时取计算好的边界进行修正
-      if (this.parent) {
-        let bounds = this.restrictToParentBoundary()
-        x = bounds.x
-        y = bounds.y
-      }
 
-      // 将当前位置对齐网格
+      // 将当前位置对齐网格，限制在父元素内进行移动
       // 当deltaX > 0 说明当前移动方向为向右移动，则向下取整。例如：10 12 14 始终取 10
       // 当deltaY < 0 说明当干移动方向为向左移动，则向上取整。例如：20 19 17 始终取 20
       if (this.axis.includes('x')) {
         if (deltaX > 0) {
-          this.transform.x = x - (x % gridX)
+          this.transform.x = this.restrictToLeftOfParent(x - (x % gridX))
         } else if (deltaX < 0) {
-          this.transform.x = x - ((x % gridX) - gridX)
+          this.transform.x = this.restrictToLeftOfParent(x - ((x % gridX) - gridX))
         }
       }
 
       if (this.axis.includes('y')) {
         if (deltaY > 0) {
-          this.transform.y = y - (y % gridY)
+          this.transform.y = this.restrictToTopOfParent(y - (y % gridY))
         } else if (deltaY < 0) {
-          this.transform.y = y - ((y % gridY) - gridY)
+          this.transform.y = this.restrictToTopOfParent(y - ((y % gridY) - gridY))
         }
       }
+    },
+    restrictToLeftOfParent(x) {
+      if (!this.parent) return x
+      x = Math.max(this.minBoundary.minLeft, x)
+      x = Math.min(this.minBoundary.maxLeft, x)
+      return x
+    },
+    restrictToTopOfParent(y) {
+      if (!this.parent) return y
+      y = Math.max(this.minBoundary.minTop, y)
+      y = Math.min(this.minBoundary.maxTop, y)
+      return y
+    },
+    restrictHeight(h, type) {
+      if (!this.parent || this.transform.rotation > 0) return h
+      if (['bl', 'bm', 'br'].includes(type)) return Math.min(this.minBoundary.maxBottomHeight, h)
+      if (['tl', 'tm', 'tr'].includes(type)) return Math.min(this.minBoundary.maxTopHeight, h)
+      return h
+    },
+    restrictWidth(w, type) {
+      if (!this.parent || this.transform.rotation > 0) return w
+      if (['tl', 'l', 'bl'].includes(type)) return Math.min(this.minBoundary.maxLeftWidth, w)
+      if (['tr', 'r', 'br'].includes(type)) return Math.min(this.minBoundary.maxRightWidth, w)
+      return w
     },
     /**
      * 限制在父元素中移动
@@ -284,7 +315,7 @@ export default {
       this[ev[this._handlerType]] && this.$emit(this._handlerType + 'end', event, this.transform)
     },
     handleResizeStart(event) {
-      let type = event.target.dataset.resizetype
+      let type = this._resizeHandler
       let rect = this.transform
       let matrix = getPoints(rect)
       let pressAngle
@@ -363,6 +394,7 @@ export default {
         transform.height = h
       }
 
+      let resizeType = this._resizeHandler
       // 限制在网格中移动，原理同拖动
       if (transform.width % gridX > 0) {
         if (transform.width > this.localeTransform.width) {
@@ -373,6 +405,7 @@ export default {
           transform.width = transform.width - ((transform.width % gridX) - gridX)
         }
       }
+
       // 原理同上
       if (transform.height % gridY > 0) {
         if (transform.height > this.localeTransform.height) {
@@ -382,6 +415,9 @@ export default {
         }
       }
 
+      // 限制在父元素中
+      transform.height = this.restrictHeight(transform.height, resizeType)
+      transform.width = this.restrictWidth(transform.width, resizeType)
       // 根据新的旋转和宽高计算新的位置
       let matrix = getPoints(transform)
       let newOpposite = matrix[pointMap[type]]
