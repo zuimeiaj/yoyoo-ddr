@@ -1,16 +1,5 @@
 <script>
-import {
-  getBoundingRect,
-  getHandler,
-  getPoints,
-  getSize,
-  heightMap,
-  pointMap,
-  pointMap2,
-  rad2deg,
-  tr2bl,
-  widthMap,
-} from './helper'
+import { getHandler, getPoints, getSize, heightMap, pointMap, pointMap2, rad2deg, tr2bl, widthMap } from './helper'
 
 export default {
   name: 'ddr',
