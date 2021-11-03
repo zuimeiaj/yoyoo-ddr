@@ -6,7 +6,6 @@ export default {
 
   methods: {
     handleChange(v) {
-      console.log('v:', v)
       this.$emit('input', v)
     },
   },

@@ -276,17 +276,6 @@ export default {
       if (['tr', 'r', 'br'].includes(type)) return Math.min(this.minBoundary.maxRightWidth, w)
       return w
     },
-    /**
-     * 限制在父元素中移动
-     * @returns {{x:number;y:number}}
-     */
-    restrictToParentBoundary() {
-      let x = Math.max(this.minBoundary.minLeft, this.localeTransform.x)
-      let y = Math.max(this.minBoundary.minTop, this.localeTransform.y)
-      x = Math.min(this.minBoundary.maxLeft, x)
-      y = Math.min(this.minBoundary.maxTop, y)
-      return { x, y }
-    },
     handleMouseUp(event) {
       document.removeEventListener('mousemove', this.handleMouseMove, false)
       document.removeEventListener('mouseup', this.handleMouseUp, false)

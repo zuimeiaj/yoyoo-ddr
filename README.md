@@ -126,10 +126,9 @@ export default {
 
 ### 注意事项
 
-- 如果使用了 `transform:scale(2)` 会导致位置不对问题
+- 如果容器使用了 `transform:scale(2)` 会导致组件的位置错误
 - 基于 vue 2 开发，不支持 vue3
-- parent 属性目前仅支持拖拽
-- 父容器如果使用了 overflow scroll 也会导致拖拽位置问题
+- 容器如果使用了 overflow scroll 也会导致组件拖拽时的位置错误
 
 ### 属性
 
