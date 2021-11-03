@@ -4,7 +4,7 @@ import EditorViewVue from './examples/vseditor/editor-view.vue'
 import { EVENT_COMPONENT_ADD, EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './examples/vseditor/event-enums'
 import FooterVue from './examples/vseditor/footer.vue'
 import HeaderVue from './examples/vseditor/header.vue'
-import { findComponentPathById, updateTreeIn } from './examples/utils'
+import { findComponent, findComponentPathById, updateTreeIn } from './examples/utils'
 import PropInspectorVue from './examples/vseditor/prop-inspector.vue'
 const historys = []
 const redoHistorys = []
@@ -23,9 +23,11 @@ export default {
       return components.map((item) => ({
         type: item.type,
         children: item.type === 'container' ? [] : void 0,
-        id: Math.random()
-          .toString()
-          .slice(2, 10),
+        id:
+          Date.now() +
+          Math.random()
+            .toString()
+            .slice(2),
         transform: {
           x: item.x - (item.x % 10),
           y: item.y - (item.y % 10),
@@ -49,19 +51,24 @@ export default {
     },
     addControl({ components, parentId }) {
       let controls = []
+      let newComponents = this.getComponents(components)
       if (parentId) {
         const { path } = findComponentPathById(this.controls, parentId)
         controls = updateTreeIn(this.controls, path, (item) => {
-          item.children = item.children.concat(this.getComponents(components))
+          item.children = item.children.concat(newComponents)
           return item
         })
       } else {
-        controls = this.controls.concat(this.getComponents(components))
+        controls = this.controls.concat(newComponents)
       }
 
       this.setControls(controls)
+
       // 默认选中最后一个
-      this.handleSelect(controls[controls.length - 1])
+      let { component } = findComponentPathById(controls, newComponents[newComponents.length - 1].id)
+
+      // 默认选中最后一个
+      this.handleSelect(component)
     },
 
     updateControlValue(key, value, isExtra) {
@@ -94,7 +101,6 @@ export default {
         item.active = true
         return item
       })
-
       this.setControls(controls)
     },
     //  组件选中，右侧展示属性编辑器
@@ -103,32 +109,31 @@ export default {
       this.updateControlStatus()
     },
     setCurrentControl(control) {
+      // 无组件选中时，直接清除属性编辑器
+      if (!control || !control.id) {
+        this.clearCurrentComponent()
+        return
+      }
+
       // 将已选中的取消选中
       if (control && this.currentId) {
         let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
           item.active = false
           return item
         })
-        this.setControls(controls)
-      }
-      // 后退时可能没得了
-      if (!control || !control.id) {
-        this.controlled = {}
-        this.currentId = ''
-        this.currentPath = []
-        return
+        // 不加入历史记录
+        this.setControls(controls, false)
       }
 
       // 深度拷贝数据，避免数据引用污染
       control = JSON.parse(JSON.stringify(control))
       Object.assign(control, control.transform, { active: true })
+      //  将选中组件设置到当前属性编辑器中
+      let { path } = findComponentPathById(this.controls, control.id)
+      this.currentPath = path
       this.controlled = control
       this.currentId = control.id
-
-      let { path } = findComponentPathById(this.controls, this.currentId)
-      this.currentPath = path
     },
-
     // 属性编辑器变化后同步到组件中
     handleChange({ name, value, extra }) {
       if (extra) {
@@ -140,38 +145,46 @@ export default {
       this.updateControlValue(name, value, extra)
     },
     getActiveComponent(ctls) {
-      return ctls.find((item) => item.active)
+      return findComponent(ctls, (item) => item.active)
     },
-    setControls(controls) {
+    setControls(controls, needRecordHistory = true) {
       this.controls = controls
-      historys.push(this.controls)
+      if (needRecordHistory) historys.push(this.controls)
     },
-
     // Actions
     handleUndo() {
       if (historys.length == 0) return
+      this.clearCurrentComponent()
       let last = historys.pop()
+      let cur = historys[historys.length - 1] || []
+      this.controls = cur
       redoHistorys.push(last)
-      this.controls = historys[historys.length - 1] || []
-      this.setCurrentControl(this.getActiveComponent(this.controls))
+      if (cur) {
+        this.setCurrentControl(this.getActiveComponent(this.controls))
+      }
     },
     handleDelete() {
       if (!this.currentId) {
         return
       }
-      let controls = this.controls.filter((item) => item.id !== this.currentId)
+      let controls = updateTreeIn(this.controls, this.currentPath, () => false)
       this.setControls(controls)
-      this.setCurrentControl(null)
+      this.clearCurrentComponent()
+    },
+    clearCurrentComponent() {
+      this.controlled = {}
+      this.currentId = ''
+      this.currentPath = []
     },
     handleClear() {
       this.setControls([])
-      this.controlled = {}
-      this.currentId = ''
+      this.clearCurrentComponent()
     },
 
     handleRedo() {
       if (redoHistorys.length === 0) return
       let contrls = redoHistorys.pop()
+      this.clearCurrentComponent()
       this.setControls(contrls)
       this.setCurrentControl(this.getActiveComponent(contrls))
     },
