@@ -2,6 +2,7 @@
 import DragCell from '@/components/ddr'
 import { EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './event-enums'
 import ComponentImpl from './component-impl'
+import { saveComponentRef } from '@/examples/utils/ref'
 export default {
   props: {
     item: Object,
@@ -63,10 +64,16 @@ export default {
       )
     },
   },
+  mounted() {
+    // 保存组件的已用，方便直接对组件进行操作
+    saveComponentRef(this.item.id, this.$refs.cell)
+  },
   render() {
     let item = this.item
     return (
       <DragCell
+        ref="cell"
+        data-component={true}
         grid={item.grid}
         axis={item.axis}
         key={item.id}

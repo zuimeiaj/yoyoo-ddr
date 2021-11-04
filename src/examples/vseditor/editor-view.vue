@@ -1,6 +1,7 @@
 <script>
 import CellWrapperVue from './cell-wrapper.vue'
 import { EVENT_COMPONENT_ADD } from './event-enums'
+
 export default {
   props: {
     value: Array,
@@ -54,13 +55,25 @@ export default {
       }
       this.eventbus.$emit(EVENT_COMPONENT_ADD, { components: addComponents, parentId: this.parentId })
     },
+
+    /**
+     * @type {HTMLElement}
+     */
+    getWrapperElement() {
+      return this.$refs.editor
+    },
   },
+
   render() {
+    // eslint-disable-next-line no-console
+    console.log('render editor')
     return (
       <div ref="editor" ondrop={this.handleDrop} ondragover={this.handleDropOver} class="vs-editor">
         {this.value.map((item) => {
           return <CellWrapperVue item={item} />
         })}
+
+        {this.$slots.default}
 
         {this.value.length === 0 && (
           <div class="guide">
@@ -68,19 +81,6 @@ export default {
             <div>Drag component or local pictures to this area to start editing</div>
           </div>
         )}
-
-        <svg ref={'grid'} width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="gridSmall" width="10" height="10" patternUnits="userSpaceOnUse">
-              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(207, 207, 207, 0.2)" strokeWidth={1} />
-            </pattern>
-            <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-              <rect width="100" height="100" fill="url(#gridSmall)" />
-              <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(186, 186, 186, 0.1)" strokeWidth={1} />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
       </div>
     )
   },

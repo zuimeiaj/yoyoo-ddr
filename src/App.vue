@@ -1,11 +1,19 @@
 <script>
 import ComponentsVue from './examples/vseditor/components.vue'
 import EditorViewVue from './examples/vseditor/editor-view.vue'
-import { EVENT_COMPONENT_ADD, EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './examples/vseditor/event-enums'
+
+import {
+  EVENT_COMPONENT_ADD,
+  EVENT_COMPONENT_SELECT,
+  EVENT_COMPONENT_TRANSFORM,
+  EVENT_COMPONENT_UNSELECT,
+} from './examples/vseditor/event-enums'
 import FooterVue from './examples/vseditor/footer.vue'
 import HeaderVue from './examples/vseditor/header.vue'
 import { findComponent, findComponentPathById, updateTreeIn } from './examples/utils'
 import PropInspectorVue from './examples/vseditor/prop-inspector.vue'
+import PluginSelectionVue from './examples/vseditor/plugins/plugin-selection.vue'
+import PluginGridVue from './examples/vseditor/plugins/plugin-grid.vue'
 const historys = []
 const redoHistorys = []
 export default {
@@ -96,9 +104,9 @@ export default {
         this.updateControlValue('transform', transform, false)
       }
     },
-    updateControlStatus() {
+    updateControlStatus(status) {
       let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
-        item.active = true
+        item.active = status
         return item
       })
       this.setControls(controls)
@@ -106,7 +114,7 @@ export default {
     //  组件选中，右侧展示属性编辑器
     handleSelect(control) {
       this.setCurrentControl(control)
-      this.updateControlStatus()
+      this.updateControlStatus(true)
     },
     setCurrentControl(control) {
       // 无组件选中时，直接清除属性编辑器
@@ -188,12 +196,21 @@ export default {
       this.setControls(contrls)
       this.setCurrentControl(this.getActiveComponent(contrls))
     },
+    handleUnselect() {
+      if (!this.currentId) return
+      this.updateControlStatus(false)
+      this.clearCurrentComponent()
+    },
+    getEditorView() {
+      return this.$refs.editor
+    },
   },
   created() {
     // 使用独立的事件对象来处理，避免多层透传回调函数
     this.eventbus.$on(EVENT_COMPONENT_ADD, this.addControl)
     this.eventbus.$on(EVENT_COMPONENT_SELECT, this.handleSelect)
     this.eventbus.$on(EVENT_COMPONENT_TRANSFORM, this.handleTransform)
+    this.eventbus.$on(EVENT_COMPONENT_UNSELECT, this.handleUnselect)
   },
   render() {
     return (
@@ -206,7 +223,10 @@ export default {
         />
         <div class="content">
           <ComponentsVue />
-          <EditorViewVue value={this.controls} />
+          <EditorViewVue ref="editor" value={this.controls}>
+            <PluginSelectionVue application={this} />
+            <PluginGridVue />
+          </EditorViewVue>
           <PropInspectorVue onChange={this.handleChange} controlled={this.controlled} />
         </div>
         <FooterVue />

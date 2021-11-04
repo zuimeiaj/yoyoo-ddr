@@ -1,9 +1,9 @@
 /**
  *
  * 根据组件的id返回对应组件和组件在属性结构的路径
- * @param {array} array
- * @param {string} id 组件的唯一ID
- * @returns {{path:array;component:object}} 返回对应的组件和组件在树形结构中的路径
+ * @param {Array} array
+ * @param {String} id 组件的唯一ID
+ * @returns {{path:Array;component:Object}} 返回对应的组件和组件在树形结构中的路径
  *
  */
 export function findComponentPathById(array, id) {
@@ -30,6 +30,7 @@ export function findComponentPathById(array, id) {
 
 /**
  *
+ * 类似数组的find(fn)方法
  * @param {Array} array
  * @param {Function} fn 返回 true表示直接返回该元素
  * @returns {Object}
@@ -53,10 +54,10 @@ export function findComponent(array, fn) {
  *
  * 基于不可变数据结构，只修改指定路径下的对象。如果回调函数返回false表示删除该路径对应的对象
  *
- * @param {array} array
- * @param {array} path
- * @param {(item:object)=> object|boolean} callback
- * @returns {array} 返回新的数组
+ * @param {Array} array
+ * @param {Array} path
+ * @param {(item:Object)=> Object|Boolean} callback
+ * @returns {Array} 返回新的数组
  *
  */
 export function updateTreeIn(array, path, callback) {
