@@ -70,6 +70,9 @@ export default {
   },
   render() {
     let item = this.item
+
+    // eslint-disable-next-line no-console
+    console.log('render component:', this.item.id)
     return (
       <DragCell
         ref="cell"

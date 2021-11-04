@@ -213,6 +213,8 @@ export default {
     this.eventbus.$on(EVENT_COMPONENT_UNSELECT, this.handleUnselect)
   },
   render() {
+    // eslint-disable-next-line no-console
+    console.log('render app')
     return (
       <div class="app">
         <HeaderVue
