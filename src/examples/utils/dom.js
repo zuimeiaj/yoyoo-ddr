@@ -97,6 +97,7 @@ export class Interaction {
    * @param {PointerEvent} e
    */
   handleMouseDown = (e) => {
+    if (e.button !== 0) return
     e.stopPropagation()
     e.preventDefault()
     document.addEventListener('mousemove', this.handleMouseMove, false)

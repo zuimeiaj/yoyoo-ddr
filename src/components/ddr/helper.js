@@ -64,6 +64,16 @@ export function getPoints({ x, y, width, height, rotation }) {
     })
 }
 export function getBoundingRect(transform) {
+  if (transform.rotation === 0) {
+    return {
+      left: transform.x,
+      top: transform.y,
+      right: transform.x + transform.width,
+      bottom: transform.y + transform.height,
+      width: transform.width,
+      height: transform.height,
+    }
+  }
   let points = getPoints(transform)
   let xarray = [],
     yarray = []

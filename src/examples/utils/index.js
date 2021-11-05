@@ -90,3 +90,20 @@ export function updateTreeIn(array, path, callback) {
   if (!_obj) resultArray = resultArray.filter(Boolean)
   return resultArray
 }
+
+/**
+ *
+ * @param {Array} array
+ * @param {Array} ids
+ * @param {(object:Object)=>Object|Boolean} callback
+ */
+export function batchUpdateIn(array, ids, callback) {
+  return array
+    .map((item) => {
+      if (ids.includes(item.id)) {
+        return callback({ ...item })
+      }
+      return item
+    })
+    .filter(Boolean)
+}

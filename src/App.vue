@@ -10,7 +10,7 @@ import {
 } from './examples/vseditor/event-enums'
 import FooterVue from './examples/vseditor/footer.vue'
 import HeaderVue from './examples/vseditor/header.vue'
-import { findComponent, findComponentPathById, updateTreeIn } from './examples/utils'
+import { batchUpdateIn, findComponent, findComponentPathById, updateTreeIn } from './examples/utils'
 import PropInspectorVue from './examples/vseditor/prop-inspector.vue'
 import PluginSelectionVue from './examples/vseditor/plugins/plugin-selection.vue'
 import PluginGridVue from './examples/vseditor/plugins/plugin-grid.vue'
@@ -57,6 +57,10 @@ export default {
         axis: 'xy',
       }))
     },
+    /**
+     * @description 批量添加组件到编辑区域，如果指定了parentid则将添加到指定的组件中。目前parentid对应的组件只能为Container类型的组件
+     * @params {{components:Array,parentId:string?}}
+     */
     addControl({ components, parentId }) {
       let controls = []
       let newComponents = this.getComponents(components)
@@ -78,7 +82,31 @@ export default {
       // 默认选中最后一个
       this.handleSelect(component)
     },
-
+    /**
+     * @description 根据变更id的数据进行批量更新
+     * @param {{[id :string]:{key:string;value:any}}} changes
+     */
+    batchUpdateControlValue(changes) {
+      let controls = batchUpdateIn(this.controls, Object.keys(changes), (item) => {
+        item[changes[item.id].key] = changes[item.id].value
+        return item
+      })
+      this.setControls(controls)
+    },
+    /**
+     * @description 指定id列表批量删除组件
+     * @param {string[]} 要删除的组件id集合
+     */
+    batchDeleteControls(deleteIds) {
+      let controls = batchUpdateIn(this.controls, deleteIds, () => false)
+      this.setControls(controls)
+    },
+    /**
+     * @description 更新选中组件指定的key
+     * @param {String} key 组件中的字段
+     * @param {any} value  新的值
+     * @param {Boolean} isExtra 是否为附加参数，对应组件的extra字段。
+     */
     updateControlValue(key, value, isExtra) {
       let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
         if (['x', 'y', 'width', 'height', 'rotation'].includes(key)) {
@@ -104,6 +132,10 @@ export default {
         this.updateControlValue('transform', transform, false)
       }
     },
+    /**
+     * @description 变更当前选中组件的状态
+     * @param {Boolean} status
+     */
     updateControlStatus(status) {
       let controls = updateTreeIn(this.controls, this.currentPath, (item) => {
         item.active = status
@@ -159,6 +191,14 @@ export default {
       this.controls = controls
       if (needRecordHistory) historys.push(this.controls)
     },
+    /**
+     * @description 清空选中状态
+     */
+    clearCurrentComponent() {
+      this.controlled = {}
+      this.currentId = ''
+      this.currentPath = []
+    },
     // Actions
     handleUndo() {
       if (historys.length == 0) return
@@ -171,18 +211,16 @@ export default {
         this.setCurrentControl(this.getActiveComponent(this.controls))
       }
     },
-    handleDelete() {
+    /**
+     * @description 删除当前选中的组件
+     */
+    deleteComponent() {
       if (!this.currentId) {
         return
       }
       let controls = updateTreeIn(this.controls, this.currentPath, () => false)
       this.setControls(controls)
       this.clearCurrentComponent()
-    },
-    clearCurrentComponent() {
-      this.controlled = {}
-      this.currentId = ''
-      this.currentPath = []
     },
     handleClear() {
       this.setControls([])
@@ -221,7 +259,7 @@ export default {
           onUndo={this.handleUndo}
           onRedo={this.handleRedo}
           onClear={this.handleClear}
-          onDelete={this.handleDelete}
+          onDelete={this.deleteComponent}
         />
         <div class="content">
           <ComponentsVue />
