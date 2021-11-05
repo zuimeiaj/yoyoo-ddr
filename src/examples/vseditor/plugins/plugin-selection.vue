@@ -11,7 +11,6 @@ import { getBoundingRect } from '@/components/ddr/helper'
  *  3、可批量缩放改变所选组件大小
  *  4、点击页面任何区域可使已选中的组件取消选中
  *  5、可拦截删除功能，对已选中的组件进行批量删除
- *
  */
 export default {
   props: {
