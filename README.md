@@ -4,41 +4,13 @@
 npm i yoyoo-ddr --save
 ```
 
-### 更新日志
+### [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
 
 ### [ v0.5.3] - 2021-11-03
 
 - 优化组件在嵌套下存在样式污染的问题
 
-### [ v0.5.2] - 2021-11-03
-
-- parent 属性支持在缩放时进行限制。但如果组件旋转角度大于 0 会忽略该属性
-
-### [ v0.5 ] - 2021-11-02
-
-增加新的功能
-
-- 新增组件在各个状态时的 class，方便定义不同状态下的样式
-- 移除了组件 style 标签的 scoped 标识，方便外部自定义样式
-- 新增 axis 属性，可选值为 x 或者 y，默认为 xy。该属性仅支持拖动
-- 新增 grid 属性，格式为[x,y]，默认为[1,1]。该属性支持拖动和缩放
-
-### [ v0.4.1] - 2021-10-30
-
-修改 render 函数下不能正确触发事件
-
-- 修改事件名称改为全小写 ，例如 dragStart 修改为 dragstart，使用 render 函数时用 onDragstart 监听事件。
-
-### [ v0.4 ] - 2021-09-09
-
-优化大数组渲染时的性能问题
-
-- 添加 ID 参数，配合数组渲染时使用 beforeActive 获取当前选中的组件
-- 添加 beforeActive 函数参数。 此函数传入组件 ID 并返回一个布尔值。 当返回值为 true 时，组件会忽略 active 属性，让组件立即可用
-- 添加 renderContent 函数参数，单个组件渲染时可以直接用 slot 的方式，数组渲染时建议使用该函数返回子节点
-- 将 template 改为 render 方式
-
-### 使用
+### 单个组件使用
 
 ```javascript
 import DDR from 'yoyoo-ddr'
@@ -48,82 +20,109 @@ export default {
   data() {
     return {
       transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
-      active: true,
-      rotatable: true,
-      draggalbe: true,
-      resizable: true,
-      parent: false,
-      resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'bl', 'l'],
-      minWidth: 10,
-      minHeight: 10,
-      acceptRatio: false,
     }
-  },
-  methods: {
-    onDrag(event, transform) {},
-    onDragStart(envent, transform) {},
-    onDragEnd(event, transform) {},
-
-    onResize(event, transform) {},
-    onResizeStart(event, transform) {},
-    onResizeEnd(event, transform) {},
-
-    onRotate(event, transform) {},
-    onRotateStart(event, transform) {},
-    onRotateEnd(event, transform) {},
-
-    beforeActive(id) {
-      // cell-id
-      return true
-    },
-
-    renderContent(cell) {
-      // cell instance of DDR
-      return <div class="cell" style="width:100%;height:100%;background:red" />
-    },
   },
   render() {
     return (
-      <DDR
-        active={this.active}
-        draggable={this.draggable}
-        resizable={this.resizable}
-        rotatable={this.rotatable}
-        parent={this.parent}
-        minWidth={this.minWidth}
-        minHeight={this.minHeight}
-        acceptRatio={this.acceptRatio}
-        onDrag={this.onDrag}
-        onDragstart={this.onDragStart}
-        onDragend={this.onDragEnd}
-        onResize={this.onResize}
-        onResizestart={this.onResizeStart}
-        onResizesnd={this.onResizeEnd}
-        onRotate={this.onResize}
-        onRotatestart={this.onRotateStart}
-        onRotateend={this.onRotateEnd}
-        value={this.transform}
-        id={'cell-id'}
-        beforeActive={this.beforeActive}
-        renderContent={this.renderContent}
-      />
+      <DDR value={this.transform}>
+        <div style="background:red;width:100%;height:100%">Child</div>
+      </DDR>
     )
   },
 }
 ```
 
-```html
-<!-- 单组件使用时可直接使用slot的方式 -->
-<DDR>
-  <CustomChild></CustomChild>
-</DDR>
-<!-- 参数 id、beforeActive、renderContent是专为大数组渲染时提供的 -->
+### 在数组中使用
+
+```javascript
+export default {
+  data() {
+    return {
+      list: [
+        { id: 1, active: false, transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 } },
+        { id: 2, active: false, transform: { x: 200, y: 100, width: 100, height: 100, rotation: 0 } },
+        { id: 3, active: false, transform: { x: 300, y: 100, width: 100, height: 100, rotation: 0 } },
+        { id: 4, active: false, transform: { x: 400, y: 100, width: 100, height: 100, rotation: 0 } },
+      ],
+    }
+  },
+  methods: {
+    handleActive(id) {
+      // 如果active属性和该函数的返回值都为false时，组件不会响应鼠标操作
+      // 将数组内对应id的数据同步为true
+      this.list = this.list.map((item) => {
+        if (item.id === id) {
+          item = { ...item, active: true }
+        } else if (item.active) {
+          item = { ...item, active: false }
+        }
+        return item
+      })
+      return true
+    },
+    renderChild(item) {
+      return <div style="background:red;width:100%;height:100%">Child {item.id}</div>
+    },
+  },
+  render() {
+    return (
+      <div>
+        {this.list.map((item) => {
+          // 如果直接使用slot插入子组件的方式会导致全量更新
+          // 可以使用 renderContent 函数，或者在对DDR组件进行一次包装来解决更新问题
+          return (
+            <DDR
+              beforeActive={this.handleActive}
+              active={item.active}
+              key={item.id}
+              id={item.id}
+              value={item.transform}
+              renderContent={this.renderChild}
+            />
+          )
+        })}
+      </div>
+    )
+  },
+}
+```
+
+### value 不是双向数据绑定
+
+```javascript
+export default {
+  data() {
+    return {
+      transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
+    }
+  },
+  methods: {
+    handleDrag(event, transform) {
+      this.transform = transform
+    },
+    handleResize(event, transform) {
+      this.transform = transform
+    },
+    handleRotate(event, transform) {
+      this.transform = transform
+    },
+  },
+  render() {
+    // 当组件被拖动时transform的值并不会同步。如果要同步，需要监听事件来同步。
+    // 在大数组渲染下，建议在拖拽结束后进行一次数据同步。可参考Demo项目的数据同步
+    return (
+      <DDR onResize={this.handleResize} onRotate={this.handleRotate} onDrag={this.handleDrag} value={this.transform}>
+        <div style="background:red;width:100%;height:100%">child</div>
+      </DDR>
+    )
+  },
+}
 ```
 
 ### 特色
 
 - 轻量级，无任何依赖
-- 可配置拖拽、旋转、缩放、支持大数组渲染
+- 可配置拖拽、旋转、缩放、网格对齐、限制父元素内移动、固定坐标轴移动、等比例缩放
 
 ### 注意事项
 
@@ -151,12 +150,12 @@ export default {
 | beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入 id                        |
 | renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot 就行了 |
 
-### 各个状态下的 class 定义
+### 自定义 class 样式
 
-- 拖动： `ddr-ready-drag` 鼠标按下,准备拖动时的 class。`ddr-dragging` 拖动时的 class
-- 缩放： `ddr-ready-resize` 鼠标按下，准备缩放时的 class。`ddr-resizing` 缩放时的 class
-- 旋转： `ddr-ready-rotate` 鼠标按下，准备旋转时的 class。`ddr-rotating` 旋转时的 class
-- 选中： `active` 组件选中时的 class
+- 拖动状态： `ddr-ready-drag` 鼠标按下,准备拖动时的 class。`ddr-dragging` 拖动时的 class
+- 缩放状态： `ddr-ready-resize` 鼠标按下，准备缩放时的 class。`ddr-resizing` 缩放时的 class
+- 旋转状态： `ddr-ready-rotate` 鼠标按下，准备旋转时的 class。`ddr-rotating` 旋转时的 class
+- 选中状态： `active` 组件选中时的 class
 
 ### 事件
 
@@ -187,12 +186,16 @@ export default {
 - [x] 编辑器区域的其他功能将以插件的形式提供，方便功能管理
 - [x] 支持历史记录回退，组件删除和画布清除等
 - [x] 支持编辑器区域框选功能
-- [ ] 持续重构代码，通常情况都是先实现再做优化。
 - [x] 完善编辑器区域的框选功能，需要实现组件的批量更新
+- [ ] 持续重构代码，通常情况都是先实现再做优化。
 - [ ] 增加快捷键功能，如：删除，复制，添加副本，剪切，粘贴等
 - [ ] 增加 canvas 组件，可生成简单的图形，如 曲线、和其他图形等。
 
-> 该项目会一直不停的完善，其目的主要是通过大量的项目实践给 `yoyoo-ddr` 这个组件增加一些有用的功能，使之尽可能满足大部分场景的需求。
+> 该项目会一直不停的完善，其目的主要是通过大量的项目实践给 `yoyoo-ddr` 增加一些有用的功能，使他尽可能满足大部分场景的需求。
+
+### 联系我
+
+如果在使用该组件时遇到问题，可以加 QQ(2498683974)联系我。欢迎提出宝贵意见和建议
 
 ### License
 
