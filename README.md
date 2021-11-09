@@ -1,3 +1,5 @@
+### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
+
 ### 安装
 
 ```
