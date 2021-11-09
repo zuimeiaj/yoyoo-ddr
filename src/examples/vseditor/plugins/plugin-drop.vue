@@ -62,6 +62,7 @@ export default {
   },
   render() {
     if (this.length > 0) return null
+
     return (
       <div class="guide">
         <div>拖拽组件或本地图片到此区域开始编辑</div>

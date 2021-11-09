@@ -65,12 +65,11 @@ export default {
     },
   },
   mounted() {
-    // 保存组件的已用，方便直接对组件进行操作
+    // 保存组件的引用，方便直接对组件进行操作
     saveComponentRef(this.item.id, this.$refs.cell)
   },
   render() {
     let item = this.item
-
     // eslint-disable-next-line no-console
     console.log('render component:', this.item.id)
     return (

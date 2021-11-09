@@ -8,11 +8,13 @@ npm i yoyoo-ddr --save
 
 ### [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
 
-### [ v0.5.3] - 2021-11-03
+### [ v0.5.4] - 2021-11-09
 
-- 优化组件在嵌套下存在样式污染的问题
+- 对 value 属性增加 v-model 功能
 
 ### 单个组件使用
+
+[Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
 
 ```javascript
 import DDR from 'yoyoo-ddr'
@@ -26,8 +28,8 @@ export default {
   },
   render() {
     return (
-      <DDR value={this.transform}>
-        <div style="background:red;width:100%;height:100%">Child</div>
+      <DDR v-model={this.transform}>
+        <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
       </DDR>
     )
   },
@@ -89,7 +91,7 @@ export default {
 }
 ```
 
-### value 不是双向数据绑定
+### value 单向数据流
 
 ```javascript
 export default {

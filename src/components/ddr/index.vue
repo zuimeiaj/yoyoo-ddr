@@ -88,7 +88,7 @@ export default {
   },
   watch: {
     value(t) {
-      this.transform = t
+      this.transform = { ...t }
     },
   },
 
@@ -149,7 +149,9 @@ export default {
         .map((item) => `${item}:${result[item]}`)
         .join(';')
     },
-
+    emitChange() {
+      this.$emit('input', { ...this.transform })
+    },
     handleMouseDown(event) {
       if (!this.active && !this.beforeActive(this.id)) return
       let point = event.touches ? event.touches[0] : event
@@ -225,6 +227,7 @@ export default {
         this.handleRotateMove(event)
         this.$emit('rotate', event, this.transform)
       }
+      this.emitChange()
     },
     doMove() {
       let [gridX, gridY] = this.grid

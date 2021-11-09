@@ -18,8 +18,6 @@ export default {
   },
 
   render() {
-    // eslint-disable-next-line no-console
-    console.log('render editor', this.parentId)
     return (
       <div ref="editor" class="vs-editor">
         {this.value.map((item) => {

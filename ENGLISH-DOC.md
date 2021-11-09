@@ -6,6 +6,8 @@ npm i yoyoo-ddr --save
 
 ### Usage
 
+Two-way data binding(v-model)
+
 ```js
 import DDR from 'yoyoo-ddr'
 import 'yoyoo-ddr/dist/yoyoo-ddr.css'
@@ -18,8 +20,8 @@ export default {
   },
   render() {
     return (
-      <DDR value={this.transform}>
-        <div style="background:red;width:100%;height:100%">Child</div>
+      <DDR v-model={this.transform}>
+        <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
       </DDR>
     )
   },
@@ -86,7 +88,7 @@ export default {
 }
 ```
 
-### `value` does not two-way data binding
+### `value` One-way data binding
 
 ```javascript
 export default {
@@ -132,7 +134,7 @@ export default {
 
 ### Props
 
-#### value
+#### value(v-model)
 
 Type: `Object`<br>
 Defaults: `{x:0,y:0,width:100,height:100,rotation:0}`<br>
