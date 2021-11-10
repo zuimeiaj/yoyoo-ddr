@@ -2,12 +2,15 @@
 import DragCell from '@/components/ddr'
 import { EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './event-enums'
 import ComponentImpl from './component-impl'
+import { saveComponentRef } from '@/examples/utils/ref'
 export default {
   props: {
     item: Object,
   },
   methods: {
-    handler(event, transform) {
+    handler(e, transform) {
+      e.stopPropagation()
+      e.preventDefault()
       this.eventbus.$emit(EVENT_COMPONENT_TRANSFORM, { type: this.handleType, transform })
     },
     beforeActive1() {
@@ -56,15 +59,25 @@ export default {
       let DynamicComponent = ComponentImpl[extra.type]
       return (
         <div class="component-impl">
-          <DynamicComponent params={extra} />
+          <DynamicComponent meta={this.item} params={extra} />
         </div>
       )
     },
   },
+  mounted() {
+    // 保存组件的引用，方便直接对组件进行操作
+    saveComponentRef(this.item.id, this.$refs.cell)
+  },
   render() {
     let item = this.item
+    // eslint-disable-next-line no-console
+    console.log('render component:', this.item.id)
     return (
       <DragCell
+        ref="cell"
+        data-component={true}
+        grid={item.grid}
+        axis={item.axis}
         key={item.id}
         id={item.id}
         draggable={item.draggable}
