@@ -1,3 +1,8 @@
+### [ v0.5.5] - 2021-11-10
+
+- 增加 maxHeight 和 maxWidth 属性
+- 调整 handlerSize 的初始值为 11
+
 ### [ v0.5.4] - 2021-11-09
 
 - 对 value 属性增加 v-model 功能
