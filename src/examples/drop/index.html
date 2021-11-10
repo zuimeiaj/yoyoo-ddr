@@ -1,0 +1,91 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <script>
+        const data = [{ "a": 1 }, { "a": 2 }, { "type": "container", "id": 5, "children": [] }, { "a": 3 }, { "type": "container", "id": 1, "children": [{ "a": 1 }, { "a": 1 }, { "a": 1 }, { "type": "container", "id": 2, "children": [{ "a": 1 }, { "a": 1 }, { "a": 1 }, { "a": 1 }, { "type": "container", "id": 3, "children": [{ "a": 1 }] }] }] }, { "a": 4 }, { "a": 4 }]
+
+        const findPathById = (array, id) => {
+            const findComponent = (controls, isRoot) => {
+                for (let index = 0; index < controls.length; index++) {
+                    const element = controls[index]
+                    if (isRoot) {
+                        componentPath = []
+                    }
+                    if (element.type === 'container') {
+                        if (element.id === id) {
+                            componentPath.push(index)
+                            return element
+                        } else {
+                            componentPath.push(index)
+                            let ele = findComponent(element.children, false)
+                            if (ele) return ele
+                        }
+                    }
+                }
+            }
+            let componentPath = []
+            const component = findComponent(array, true)
+            return { path: componentPath, component }
+        }
+
+        function updateTreeIn(array, path, callback) {
+            path = path.slice()
+            let resultArray = array.slice()
+            let index = path.shift()
+            let firstIndex = index
+            let newData = { ...resultArray[index] }
+            let object = newData
+            while (path.length > 0) {
+                index = path.shift()
+                if (newData.children && newData.children.length > 0) {
+                    newData.children = newData.children.slice()
+                    if (path.length === 0) {
+                        let _obj = callback({ ...newData.children[index] })
+                        newData.children[index] = _obj
+                        resultArray[firstIndex] = object
+                        return resultArray
+                    } else {
+                        let _obj = { ...newData.children[index] }
+                        newData.children[index] = _obj
+                        newData = _obj
+                    }
+                }
+            }
+
+            let _obj = callback(newData)
+            resultArray[index] = _obj
+            return resultArray
+        }
+
+        const result = findPathById(data, 3)
+        const newData = updateTreeIn(data, result.path, item => {
+
+            item.newProp = 1
+            return item
+        })
+
+
+        console.log(findPathById(data, 3))
+        console.log(findPathById(newData, 3))
+        console.log('data0===newData0 should be true', data[0] === newData[0])
+        console.log('data4===newData4 should be false', data[4] === newData[4])
+        console.log('data4,1===newData4,1 should be true', data[4]['children'][1] === newData[4]['children'][1])
+        console.log('data4,2===newData4,2 should be true', data[4]['children'][2] === newData[4]['children'][2])
+        console.log('data4,3===newData4,3 should be false', data[4]['children'][3] === newData[4]['children'][3])
+
+
+
+
+
+    </script>
+</body>
+
+</html>

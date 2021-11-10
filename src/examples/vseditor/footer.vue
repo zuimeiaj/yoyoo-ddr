@@ -1,23 +1,13 @@
 <script>
 export default {
   render() {
-    return (
-      <footer class="vs-footer">
-        <a target="_blank" href="https://zuimeiaj.github.io/yoyoo/">
-          编辑器(React 版)
-        </a>
-        <a target="_blank" href="https://github.com/zuimeiaj/yoyoo-ddr">
-          Github
-        </a>
-      </footer>
-    )
+    return <footer class="vs-footer" />
   },
 }
 </script>
 
 <style lang="less" scoped>
 .vs-footer {
-  height: 30px;
   align-items: center;
   display: flex;
   padding: 0 15px;
