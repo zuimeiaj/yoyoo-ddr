@@ -1,3 +1,4 @@
+### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
 ### 安装
 
@@ -5,22 +6,9 @@
 npm i yoyoo-ddr --save
 ```
 
-### 更新日志
+### 单个组件使用
 
-优化大数组渲染时的性能问题
-
-### [ v0.4.1] - 2021-10-30
-
-- 修改事件名称改为全小写 ，例如 dragStart 修改为 dragstart，使用render函数时用onDragstart监听事件。
-
-### [ v0.4 ] - 2021-09-09
-
-- 添加ID参数，配合数组渲染时使用beforeActive获取当前选中的组件
-- 添加 beforeActive 函数参数。 此函数传入组件 ID 并返回一个布尔值。 当返回值为true时，组件会忽略active属性，让组件立即可用
-- 添加renderContent函数参数，单个组件渲染时可以直接用slot的方式，数组渲染时建议使用该函数返回子节点
-- 将template 改为render方式
-
-### 使用
+[Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
 
 ```javascript
 import DDR from 'yoyoo-ddr'
@@ -30,115 +18,149 @@ export default {
   data() {
     return {
       transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
-      active: true,
-      rotatable: true,
-      draggalbe: true,
-      resizable: true,
-      parent: false,
-      resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'bl', 'l'],
-      minWidth: 10,
-      minHeight: 10,
-      acceptRatio: false,
+    }
+  },
+  render() {
+    return (
+      <DDR v-model={this.transform}>
+        <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
+      </DDR>
+    )
+  },
+}
+```
+
+### 在数组中使用
+
+```javascript
+export default {
+  data() {
+    return {
+      list: [
+        { id: 1, active: false, transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 } },
+        { id: 2, active: false, transform: { x: 200, y: 100, width: 100, height: 100, rotation: 0 } },
+        { id: 3, active: false, transform: { x: 300, y: 100, width: 100, height: 100, rotation: 0 } },
+        { id: 4, active: false, transform: { x: 400, y: 100, width: 100, height: 100, rotation: 0 } },
+      ],
     }
   },
   methods: {
-    onDrag(event, transform) {},
-    onDragStart(envent, transform) {},
-    onDragEnd(event, transform) {},
-
-    onResize(event, transform) {},
-    onResizeStart(event, transform) {},
-    onResizeEnd(event, transform) {},
-
-    onRotate(event, transform) {},
-    onRotateStart(event, transform) {},
-    onRotateEnd(event, transform) {},
-
-    beforeActive(id) {
-      // cell-id
+    handleActive(id) {
+      // 如果active属性和该函数的返回值都为false时，组件不会响应鼠标操作
+      // 将数组内对应id的数据同步为true
+      this.list = this.list.map((item) => {
+        if (item.id === id) {
+          item = { ...item, active: true }
+        } else if (item.active) {
+          item = { ...item, active: false }
+        }
+        return item
+      })
       return true
     },
-
-    renderContent(cell) {
-      // cell instance of DDR
-      return <div class="cell" style="width:100%;height:100%;background:red" />
+    renderChild(item) {
+      return <div style="background:red;width:100%;height:100%">Child {item.id}</div>
     },
   },
   render() {
     return (
-      <DDR
-        active={this.active}
-        draggable={this.draggable}
-        resizable={this.resizable}
-        rotatable={this.rotatable}
-        parent={this.parent}
-        minWidth={this.minWidth}
-        minHeight={this.minHeight}
-        acceptRatio={this.acceptRatio}
-        onDrag={this.onDrag}
-        onDragstart={this.onDragStart}
-        onDragend={this.onDragEnd}
-        onResize={this.onResize}
-        onResizestart={this.onResizeStart}
-        onResizesnd={this.onResizeEnd}
-        onRotate={this.onResize}
-        onRotatestart={this.onRotateStart}
-        onRotateend={this.onRotateEnd}
-        value={this.transform}
-        id={'cell-id'}
-        beforeActive={this.beforeActive}
-        renderContent={this.renderContent}
-      />
+      <div>
+        {this.list.map((item) => {
+          // 如果直接使用slot插入子组件的方式会导致全量更新
+          // 可以使用 renderContent 函数，或者在对DDR组件进行一次包装来解决更新问题
+          return (
+            <DDR
+              beforeActive={this.handleActive}
+              active={item.active}
+              key={item.id}
+              id={item.id}
+              value={item.transform}
+              renderContent={this.renderChild}
+            />
+          )
+        })}
+      </div>
     )
   },
 }
+```
 
+### value 单向数据流
 
-单组件使用时可直接使用slot的方式
-<DDR>
-  <CustomChild></CustomChild>
-</DDR>
-
-参数 id、beforeActive、renderContent是专为大数组渲染时提供的
-
-</DDR> 
+```javascript
+export default {
+  data() {
+    return {
+      transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
+    }
+  },
+  methods: {
+    handleDrag(event, transform) {
+      this.transform = transform
+    },
+    handleResize(event, transform) {
+      this.transform = transform
+    },
+    handleRotate(event, transform) {
+      this.transform = transform
+    },
+  },
+  render() {
+    // 当组件被拖动时transform的值并不会同步。如果要同步，需要监听事件来同步。
+    // 在大数组渲染下，建议在拖拽结束后进行一次数据同步。可参考Demo项目的数据同步
+    return (
+      <DDR onResize={this.handleResize} onRotate={this.handleRotate} onDrag={this.handleDrag} value={this.transform}>
+        <div style="background:red;width:100%;height:100%">child</div>
+      </DDR>
+    )
+  },
+}
 ```
 
 ### 特色
 
 - 轻量级，无任何依赖
-- 可配置拖拽、旋转、缩放、支持大数组渲染
+- 可配置拖拽、旋转、缩放、网格对齐、限制父元素内移动、固定坐标轴移动、等比例缩放
 
 ### 注意事项
 
-- 如果使用了 `transform:scale(2)` 会导致位置不对问题
-- 基于vue 2 开发，不支持vue3
-- parent属性目前仅支持拖拽
-- 父容器如果使用了overflow scroll 也会导致拖拽位置问题
-
+- 如果容器使用了 `transform:scale(2)` 会导致组件的位置错误
+- 基于 vue 2 开发，不支持 vue3
+- 容器如果使用了 overflow scroll 也会导致组件拖拽时的位置错误
 
 ### 属性
 
-| 名称          | 类型      | 默认值                                      | 描述                                                                           |
-| ------------- | -------- | ----------------------------------------- | ----------------------------------------------------------------------------------------
-| draggable     | boolean  | true                                      | 是否可拖拽                                                                       |
-| rotatable     | boolean  | true                                      | 是否可旋转                                                                       |
-| resizable     | boolean  | true                                      | 是否可缩放                                                                       |
-| active        | boolean  | true                                      | 是否可用，                                                                       |
-| acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                      |
-| parent        | boolean  | false                                     | 限制在父容器内拖拽，仅拖拽时才会判断                                                 |
-| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                    |
-| minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                  |
-| minHeight     | number   | 1                                         | 可缩放最小高度                                                                    |
-| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持v-model，但能响应value的更新                       |
-| id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                    |
-| beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入id                              |
-| renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot就行了           |
+| 名称          | 类型     | 默认值                                    | 描述                                                                                 |
+| ------------- | -------- | ----------------------------------------- | ------------------------------------------------------------------------------------ |
+| draggable     | boolean  | true                                      | 是否可拖拽                                                                           |
+| rotatable     | boolean  | true                                      | 是否可旋转                                                                           |
+| resizable     | boolean  | true                                      | 是否可缩放                                                                           |
+| active        | boolean  | true                                      | 是否可用，                                                                           |
+| acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                    |
+| parent        | boolean  | false                                     | 限制在父容器内拖拽，支持拖动和缩放，旋转角度大于 0 不会判断                          |
+| resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                       |
+| handlerSize   | number   | 11                                        | 定义缩放控制点                                                                       |
+| minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                     |
+| minHeight     | number   | 1                                         | 可缩放最小高度                                                                       |
+| maxWidth      | number   | 100000000                                 | 可缩放最大宽度                                                                       |
+| maxHeight     | number   | 100000000                                 | 可缩放最大高度                                                                       |
+| value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持 v-model，但能响应 value 的更新                |
+| grid          | Array    | [1,1]                                     | 格式[x,y]，支持拖动和缩放对齐。只能为整数                                            |
+| axis          | String   | 'xy'                                      | 指定坐标轴拖动，默认 xy 都可以拖动，仅支持拖动                                       |
+| id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                   |
+| beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入 id                        |
+| renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot 就行了 |
+
+### 自定义 class 样式
+
+- 拖动状态： `ddr-ready-drag` 鼠标按下,准备拖动时的 class。`ddr-dragging` 拖动时的 class
+- 缩放状态： `ddr-ready-resize` 鼠标按下，准备缩放时的 class。`ddr-resizing` 缩放时的 class
+- 旋转状态： `ddr-ready-rotate` 鼠标按下，准备旋转时的 class。`ddr-rotating` 旋转时的 class
+- 选中状态： `active` 组件选中时的 class
 
 ### 事件
 
 拖拽、旋转、缩放时会触发一系列事件，该事件都会传入两个参数，第一个参数为原始的事件对象，第二个参数为当前组件的位置信息。
-
 
 | name        | args                          |
 | ----------- | ----------------------------- |
@@ -151,12 +173,32 @@ export default {
 | resizestart | (event,transform)=>{} :void 0 |
 | resize      | (event,transform)=>{} :void 0 |
 | resizeend   | (event,transform)=>{} :void 0 |
-  
+
 ### 链接
 
- [ 在线演示 https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
+- [在线演示](https://zuimeiaj.github.io/ddr/)
 
- [ 设计工具，使用react实现的 http://zuimeiaj.github.io/yoyoo/](http://zuimeiaj.github.io/yoyoo/)
+- [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
+
+### Demo 项目目前已实现的功能，且在不停的更新中
+
+- [x] 可以自定义组件，在目录 `src/examples/vseditor/component-impl.js`中增加实现并导出。 components.vue 中添加对应的类型即可。
+- [x] 可自定义组件属性编辑器 在目录 `src/examples/vseditor/prop-inspector.vue` 中添加对应的类型并实现即可
+- [x] 可从组件列表中拖拽组件到编辑区域进行编辑
+- [x] 支持嵌套组件，`component-impl.js` 中的 `Container` 组件实际包含了一个`editor-view`组件，可无限嵌套
+- [x] 编辑器区域的其他功能将以插件的形式提供，方便功能管理
+- [x] 支持历史记录回退，组件删除和画布清除等
+- [x] 支持编辑器区域框选功能
+- [x] 完善编辑器区域的框选功能，需要实现组件的批量更新
+- [ ] 持续重构代码，通常情况都是先实现再做优化。
+- [ ] 增加快捷键功能，如：删除，复制，添加副本，剪切，粘贴等
+- [ ] 增加 canvas 组件，可生成简单的图形，如 曲线、和其他图形等。
+
+> 该项目会一直不停的完善，其目的主要是通过大量的项目实践给 `yoyoo-ddr` 增加一些有用的功能，使他尽可能满足大部分场景的需求。
+
+### 联系我
+
+如果在使用该组件时遇到问题，可以加 QQ(2498683974)联系我。欢迎提出宝贵意见和建议
 
 ### License
 

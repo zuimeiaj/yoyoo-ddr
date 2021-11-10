@@ -5,6 +5,13 @@ export default {
     return {
       components: [
         {
+          type: 'label',
+          value: 'Hi~我是一段文本',
+          name: 'Label',
+          width: 150,
+          height: 30,
+        },
+        {
           type: 'input',
           value: '输入',
           inputType: 'input',
@@ -58,6 +65,13 @@ export default {
           width: 100,
           height: 30,
         },
+        {
+          type: 'container',
+          name: 'Container',
+          width: 200,
+          height: 200,
+          children: [],
+        },
       ],
     }
   },
@@ -86,8 +100,9 @@ export default {
 
 <style lang="less" scoped>
 .vs-components {
-  width: 100px;
+  width: 200px;
   border-right: 1px solid #ececec;
+  position: relative;
   overflow-y: scroll;
   background: #f8f8f8;
   &::-webkit-scrollbar {
@@ -101,7 +116,12 @@ export default {
 }
 .components-item {
   height: 100px;
+  width: 50%;
+  float: left;
   display: flex;
+  &:nth-child(2n + 1) {
+    border-right: 1px solid #ececec;
+  }
   border-bottom: 1px solid #ececec;
   align-items: center;
   justify-content: center;
