@@ -16,11 +16,6 @@
     "lint": "vue-cli-service lint",
     "lib": "vue-cli-service build --target lib --name yoyoo-ddr --dest dist libs/yoyoo-ddr/index.js"
   },
-  "dependencies": {
-    "core-js": "^2.6.5",
-    "vue": "^2.6.10",
-    "vue-router": "^3.5.3"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zuimeiaj/yoyoo-ddr"
@@ -34,7 +29,10 @@
     "eslint-plugin-vue": "^5.0.0",
     "less-loader": "^7.3.0",
     "vue-template-compiler": "^2.6.10",
-    "less": "^4.1.2"
+    "less": "^4.1.2",
+    "core-js": "^2.6.5",
+    "vue": "^2.6.10",
+    "vue-router": "^3.5.3"
   },
   "homepage": "https://zuimeiaj.github.io/ddr/",
   "license": "MIT",

@@ -10,4 +10,8 @@ export default [
     path: '/twowaybind',
     component: () => import('@/examples/twowaybind'),
   },
+  {
+    path: '/restrict',
+    component: () => import('@/examples/restrict'),
+  },
 ]

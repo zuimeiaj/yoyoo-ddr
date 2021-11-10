@@ -261,6 +261,18 @@ Example:
 <DDR resizeHandler={['tl', 'tr', 'br', 'bl']} />
 ```
 
+#### handlerSize
+
+Type: `Number`<br>
+Defaults: `11`<br>
+Required: `false`<br>
+
+Example:
+
+```js
+<DDR handlerSize={7} />
+```
+
 #### minWidth
 
 Type: `Number`<br>
@@ -282,6 +294,34 @@ Defaults: `1`<br>
 Required: `false`<br>
 
 Resizable minimum height
+
+Example:
+
+```js
+<DDR minHeight={40} />
+```
+
+#### maxWidth
+
+Type: `Number`<br>
+Defaults: `100000000`<br>
+Required: `false`<br>
+
+Resizable maximum width
+
+Example:
+
+```js
+<DDR minWidth={40} />
+```
+
+#### maxHeight
+
+Type: `Number`<br>
+Defaults: `100000000`<br>
+Required: `false`<br>
+
+Resizable maximum height
 
 Example:
 

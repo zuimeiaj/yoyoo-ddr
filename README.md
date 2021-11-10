@@ -145,8 +145,11 @@ export default {
 | acceptRatio   | boolean  | false                                     | 纵横比，单词拼写错误。但是发现太晚了,所以就这样吧                                    |
 | parent        | boolean  | false                                     | 限制在父容器内拖拽，支持拖动和缩放，旋转角度大于 0 不会判断                          |
 | resizeHandler | Array    | ['tl','tm','tr','r','br','bm','l','bl']   | 定义缩放控制点                                                                       |
+| handlerSize   | number   | 11                                        | 定义缩放控制点                                                                       |
 | minWidth      | number   | 1                                         | 可缩放的最小宽度                                                                     |
 | minHeight     | number   | 1                                         | 可缩放最小高度                                                                       |
+| maxWidth      | number   | 100000000                                 | 可缩放最大宽度                                                                       |
+| maxHeight     | number   | 100000000                                 | 可缩放最大高度                                                                       |
 | value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持 v-model，但能响应 value 的更新                |
 | grid          | Array    | [1,1]                                     | 格式[x,y]，支持拖动和缩放对齐。只能为整数                                            |
 | axis          | String   | 'xy'                                      | 指定坐标轴拖动，默认 xy 都可以拖动，仅支持拖动                                       |

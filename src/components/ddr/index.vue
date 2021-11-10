@@ -12,7 +12,7 @@ export default {
     },
     handlerSize: {
       type: Number,
-      default: 13,
+      default: 11,
     },
     active: {
       default: true,
@@ -48,6 +48,14 @@ export default {
       type: Number,
       default: 1,
     },
+    maxWidth: {
+      type: Number,
+      default: 100000000,
+    },
+    maxHeight: {
+      type: Number,
+      default: 100000000,
+    },
     parent: {
       type: Boolean,
       default: false,
@@ -57,16 +65,14 @@ export default {
       default: () => false,
     },
     id: [Number, String],
-    renderContent: {
-      type: Function,
-    },
+    renderContent: Function,
     grid: {
       type: Array,
       default: () => [1, 1],
     },
     axis: {
       type: String,
-      default: 'yx', // x | y 不填写则都可以移动，仅移动时生效
+      default: 'xy', // x | y 不填写则都可以移动，仅移动时生效
     },
   },
   data() {
@@ -362,8 +368,8 @@ export default {
         if (widthMap[type]) h = w / this.currentRatio
         else w = h * this.currentRatio
       }
-      w = Math.max(Math.round(w), this.minWidth)
-      h = Math.max(Math.round(h), this.minHeight)
+      w = Math.min(Math.max(Math.round(w), this.minWidth), this.maxWidth)
+      h = Math.min(Math.max(Math.round(h), this.minHeight), this.maxHeight)
 
       // 判断当前控制点是否为宽度缩放还是高度缩放
       if (widthMap[type] && !ratio) {

@@ -48,11 +48,12 @@ export function rad2deg(rad) {
   return (rad * 180) / Math.PI
 }
 
-// 获取矩形在平面上的8个坐标点，从左上角顺时针放到数组里返回
+// 获取矩形旋转后在平面上的8个坐标点，从左上角顺时针放到数组里返回
 export function getPoints({ x, y, width, height, rotation }) {
   let a = (rotation * Math.PI) / 180
   let wc = width / 2
   let hc = height / 2
+  // 标准的矩阵点乘公式，返回旋转后的坐标
   let deg = new Matrix([[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]])
   let rect = new Matrix([[-wc, hc], [0, hc], [wc, hc], [wc, 0], [wc, -hc], [0, -hc], [-wc, -hc], [-wc, 0]])
   return deg
