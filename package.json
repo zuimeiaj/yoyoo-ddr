@@ -1,19 +1,20 @@
 {
   "name": "yoyoo-ddr",
-  "version": "0.4.0",
+  "version": "0.5.5",
   "description": "Lightweight and no dependencies,use draggable, resizable, rotatable, configurable for vue component ",
   "private": false,
   "main": "dist/yoyoo-ddr.umd.min.js",
-  "keyword": "draggable resizable rotatable vue-ddr",
+  "keywords": [
+    "draggable",
+    "resizable",
+    "rotatable",
+    "vue2"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build --dest ddr",
     "lint": "vue-cli-service lint",
     "lib": "vue-cli-service build --target lib --name yoyoo-ddr --dest dist libs/yoyoo-ddr/index.js"
-  },
-  "dependencies": {
-    "core-js": "^2.6.5",
-    "vue": "^2.6.10"
   },
   "repository": {
     "type": "git",
@@ -26,7 +27,12 @@
     "babel-eslint": "^10.0.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
-    "vue-template-compiler": "^2.6.10"
+    "less-loader": "^7.3.0",
+    "vue-template-compiler": "^2.6.10",
+    "less": "^4.1.2",
+    "core-js": "^2.6.5",
+    "vue": "^2.6.10",
+    "vue-router": "^3.5.3"
   },
   "homepage": "https://zuimeiaj.github.io/ddr/",
   "license": "MIT",
