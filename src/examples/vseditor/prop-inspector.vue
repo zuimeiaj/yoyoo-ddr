@@ -1,4 +1,14 @@
 <script>
+import PropCheckInputVue from './prop-check-input.vue'
+import PropGridInputVue from './prop-grid-input.vue'
+import PropNumberInputVue from './prop-number-input.vue'
+import PropRadioInputVue from './prop-radio-input.vue'
+const PropInputImpl = {
+  grid: PropGridInputVue,
+  radio: PropRadioInputVue,
+  number: PropNumberInputVue,
+  checkbox: PropCheckInputVue,
+}
 export default {
   props: ['controlled'],
   data() {
@@ -11,6 +21,12 @@ export default {
         { type: 'number', name: 'rotation' },
         { type: 'number', name: 'minWidth' },
         { type: 'number', name: 'minHeight' },
+        { type: 'grid', name: 'grid' },
+        {
+          type: 'radio',
+          name: 'axis',
+          options: [{ label: 'y', value: 'y' }, { label: 'x', value: 'x' }, { label: 'xy', value: 'xy' }],
+        },
         { type: 'checkbox', name: 'acceptRatio' },
         { type: 'checkbox', name: 'draggable' },
         { type: 'checkbox', name: 'resizable' },
@@ -22,11 +38,10 @@ export default {
     }
   },
   methods: {
-    handleChange(e, item) {
+    customChange(e, item) {
       this.$emit('change', {
         ...item,
-        value: e.target.value,
-        checked: e.target.checked,
+        value: e,
       })
     },
     extraChange(e, item) {
@@ -44,15 +59,14 @@ export default {
       <div class="vs-inspector">
         <div>DDR Props</div>
         {this.inputs.map((item) => {
+          let DyInput = PropInputImpl[item.type]
           return (
             <div class="input-item" key={item.name}>
               <label class="input-label">{item.name}</label>
-              <input
-                onInput={(e) => this.handleChange(e, item)}
-                class="input-value"
-                type={item.type}
-                checked={this.controlled[item.name]}
+              <DyInput
+                options={item.options}
                 value={this.controlled[item.name]}
+                onInput={(e) => this.customChange(e, item)}
               />
             </div>
           )
@@ -83,25 +97,28 @@ export default {
 
 <style lang="less">
 .vs-inspector {
-  width: 200px;
+  width: 240px;
   border-left: 1px solid #ececec;
   background: #f8f8f8;
   padding: 15px;
+  overflow-y: auto;
   .input-item {
     margin-bottom: 12px;
+    display: flex;
   }
   .input-label {
     display: inline-block;
-    width: 80px;
+    width: 100px;
     color: #555;
   }
   .input-value:not([type='checkbox']) {
-    width: 80px;
     height: 24px;
     padding: 0;
     border-radius: 0;
     border: 1px solid #d3d3d3;
     padding-left: 10px;
+    flex: 1;
+    width: 0;
   }
 }
 </style>

@@ -16,12 +16,12 @@ export const pointMap = {
 // 计算矩形大小时使用四个直角坐标
 export const pointMap2 = {
   br: 0,
-  tr: 6,
-  tl: 4,
-  bl: 2,
-  tm: 4,
   bm: 0,
+  bl: 2,
   l: 2,
+  tl: 4,
+  tm: 4,
+  tr: 6,
   r: 6,
 }
 
@@ -48,11 +48,12 @@ export function rad2deg(rad) {
   return (rad * 180) / Math.PI
 }
 
-// 获取矩形在平面上的8个坐标点，从左上角顺时针放到数组里返回
+// 获取矩形旋转后在平面上的8个坐标点，从左上角顺时针放到数组里返回
 export function getPoints({ x, y, width, height, rotation }) {
   let a = (rotation * Math.PI) / 180
   let wc = width / 2
   let hc = height / 2
+  // 标准的矩阵点乘公式，返回旋转后的坐标
   let deg = new Matrix([[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]])
   let rect = new Matrix([[-wc, hc], [0, hc], [wc, hc], [wc, 0], [wc, -hc], [0, -hc], [-wc, -hc], [-wc, 0]])
   return deg
@@ -64,6 +65,16 @@ export function getPoints({ x, y, width, height, rotation }) {
     })
 }
 export function getBoundingRect(transform) {
+  if (transform.rotation === 0) {
+    return {
+      left: transform.x,
+      top: transform.y,
+      right: transform.x + transform.width,
+      bottom: transform.y + transform.height,
+      width: transform.width,
+      height: transform.height,
+    }
+  }
   let points = getPoints(transform)
   let xarray = [],
     yarray = []

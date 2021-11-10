@@ -4,12 +4,33 @@ export default {
   render() {
     return (
       <div class="vs-header">
-        <h1>Vue-ratatable-resizable-draggable</h1>
-        <div>
-          <button onClick={() => this.$emit('undo')}>Undo</button>
-          <button onClick={() => this.$emit('redo')}>Redo</button>
-          <button onClick={() => this.$emit('delete')}>Delete</button>
-          <button onClick={() => this.$emit('clear')}>Clear </button>
+        <h1>DEMO Project</h1>
+        <div class="header-actions">
+          <button title="Return to the previous state" data-action="undo" onClick={() => this.$emit('undo')}>
+            Undo
+          </button>
+          <button title="Return to the next state" data-action="redo" onClick={() => this.$emit('redo')}>
+            Redo
+          </button>
+          <button title="Delete selected component" data-action="delete" onClick={() => this.$emit('delete')}>
+            Delete
+          </button>
+          <button
+            title="Clear all components in the editing area"
+            data-action="clear"
+            onClick={() => this.$emit('clear')}
+          >
+            Clear
+          </button>
+          <iframe
+            class="github-btn"
+            src="https://ghbtns.com/github-btn.html?user=zuimeiaj&repo=yoyoo-ddr&type=star&count=true&size=large"
+            frameborder="0"
+            scrolling="0"
+            width="170"
+            height="30"
+            title="GitHub"
+          />
         </div>
       </div>
     )
@@ -25,23 +46,30 @@ export default {
   align-items: center;
   background: #f8f8f8;
   h1 {
-    padding-left: 15px;
+    text-align: center;
     font-size: 20px;
     color: #333;
     font-weight: 300;
+    width: 200px;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
   }
   button {
-    padding: 4px 16px;
-    font-size: 14px;
+    padding: 5px 12px;
+    font-size: 16px;
     color: #555;
-    background: #f5f5f5;
-    border: 1px solid #d3d3d3;
-    margin-left: 20px;
-    border-radius: 40px;
+    background: #eee;
+    background-image: linear-gradient(to bottom, #fcfcfc 0, #eee 100%);
+    border: 1px solid #d5d5d5;
+    margin-right: 20px;
+    border-radius: 4px;
     &:hover {
-      background: #d3d3d3;
+      background: #ddd;
       cursor: pointer;
       transition: all 300ms;
+      background-image: linear-gradient(to bottom, #eee 0, #ddd 100%);
     }
   }
 }
