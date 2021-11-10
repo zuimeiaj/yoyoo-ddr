@@ -6,8 +6,6 @@
 npm i yoyoo-ddr --save
 ```
 
-### [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
-
 ### 单个组件使用
 
 [Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
@@ -178,7 +176,9 @@ export default {
 
 ### 链接
 
-[ 在线演示 https://zuimeiaj.github.io/ddr/ ](https://zuimeiaj.github.io/ddr/)
+- [在线演示](https://zuimeiaj.github.io/ddr/)
+
+- [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
 
 ### Demo 项目目前已实现的功能，且在不停的更新中
 
