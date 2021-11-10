@@ -8,10 +8,6 @@ npm i yoyoo-ddr --save
 
 ### [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
 
-### [ v0.5.4] - 2021-11-09
-
-- 对 value 属性增加 v-model 功能
-
 ### 单个组件使用
 
 [Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
