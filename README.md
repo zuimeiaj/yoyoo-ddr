@@ -5,7 +5,7 @@
 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
 
 <p align='center'>
-Draggable, rotatable and zoomable components based on Vue 2
+Draggable, rotatable and resizable components based on Vue 2
 </p>
 
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
