@@ -2,11 +2,10 @@
   <img style="150px" height="150px" src="https://github.com/zuimeiaj/yoyoo-ddr/blob/master/src/assets/vue-drag-resize-rotate.jpg"/>
 </p>
 
-[![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
-
 <p align='center'>
 Draggable, rotatable and resizable components based on Vue 2
 </p>
+[![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
 
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
