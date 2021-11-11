@@ -2,9 +2,7 @@
   <img style="150px" height="150px" src="https://github.com/zuimeiaj/yoyoo-ddr/blob/master/src/assets/vue-drag-resize-rotate.jpg"/>
 </p>
 
-<p align='center'>
 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
-</p>
 
 <p align='center'>
 Draggable, rotatable and zoomable components based on Vue 2
