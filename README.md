@@ -3,16 +3,22 @@
 </p>
 
 <p align='center'>
-Draggable, rotatable and resizable components based on Vue 2
+Draggable, rotatable and resizable components based on Vue (2 & 3)
 </p>
 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
 
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
-### 安装
+### 安装-vue 2
 
 ```
 npm i yoyoo-ddr --save
+```
+
+### 安装-vue 3
+
+```
+npm i yoyoo-ddr-vue3 --save
 ```
 
 ### 单个组件使用
@@ -23,6 +29,10 @@ npm i yoyoo-ddr --save
 import DDR from 'yoyoo-ddr'
 import 'yoyoo-ddr/dist/yoyoo-ddr.css'
 
+// vue 3
+// import DDR from 'yoyoo-ddr-vue3'
+// import 'yoyoo-ddr-vue3/dist/yoyoo-ddr-vue3.css'
+
 export default {
   data() {
     return {
@@ -30,6 +40,7 @@ export default {
     }
   },
   render() {
+    // vue 3 使用 v-model:value={this.transform}
     return (
       <DDR v-model={this.transform}>
         <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
