@@ -1,7 +1,13 @@
-### Install
+### Install (vue2)
 
 ```
 npm i yoyoo-ddr --save
+```
+
+### Install (vue3)
+
+```
+npm i yoyoo-ddr-vue3 --save
 ```
 
 ### Usage
@@ -12,6 +18,9 @@ Two-way data binding(v-model)
 import DDR from 'yoyoo-ddr'
 import 'yoyoo-ddr/dist/yoyoo-ddr.css'
 
+// vue 3
+// import DDR from 'yoyoo-ddr-vue3'
+// import 'yoyoo-ddr-vue3/dist/yoyoo-ddr-vue3.css'
 export default {
   data() {
     return {
@@ -19,6 +28,7 @@ export default {
     }
   },
   render() {
+    // vue 3 v-model:value={this.transform}
     return (
       <DDR v-model={this.transform}>
         <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
