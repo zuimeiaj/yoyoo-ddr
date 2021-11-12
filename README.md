@@ -144,7 +144,7 @@ export default {
 ### 注意事项
 
 - 如果容器使用了 `transform:scale(2)` 会导致组件的位置错误
-- 基于 vue 2 开发，不支持 vue3
+- vue3 请安装 yoyoo-ddr-vue，功能完全一致
 - 容器如果使用了 overflow scroll 也会导致组件拖拽时的位置错误
 
 ### 属性
