@@ -5,17 +5,16 @@
 <p align='center'>
 Draggable, rotatable and resizable components based on Vue (2 & 3)
 </p>
-[![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
 
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
-### 安装-vue 2
+### 安装-vue 2 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
 
 ```
 npm i yoyoo-ddr --save
 ```
 
-### 安装-vue 3
+### 安装-vue 3 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-vue3.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-vue3)
 
 ```
 npm i yoyoo-ddr-vue3 --save
