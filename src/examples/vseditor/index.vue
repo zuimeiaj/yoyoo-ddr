@@ -176,6 +176,9 @@ export default {
     },
     // 属性编辑器变化后同步到组件中
     handleChange({ name, value, extra }) {
+      if (!this.currentId) {
+        return
+      }
       if (extra) {
         this.controlled.extra[name] = value
       } else {

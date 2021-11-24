@@ -54,7 +54,6 @@ export default {
     },
   },
   render() {
-    if (!this.controlled.id) return null
     return (
       <div class="vs-inspector">
         <div>DDR Props</div>
@@ -73,22 +72,24 @@ export default {
         })}
 
         <div>Extra Props</div>
-        {this.extraInputs
-          .filter((item) => item.name in this.controlled.extra)
-          .map((item) => {
-            return (
-              <div class="input-item" key={item.name}>
-                <label class="input-label">{item.name}</label>
-                <input
-                  onInput={(e) => this.extraChange(e, item)}
-                  class="input-value"
-                  type={item.type}
-                  checked={this.controlled.extra[item.name]}
-                  value={this.controlled.extra[item.name]}
-                />
-              </div>
-            )
-          })}
+        {this.controlled &&
+          this.controlled.extra &&
+          this.extraInputs
+            .filter((item) => item.name in this.controlled.extra)
+            .map((item) => {
+              return (
+                <div class="input-item" key={item.name}>
+                  <label class="input-label">{item.name}</label>
+                  <input
+                    onInput={(e) => this.extraChange(e, item)}
+                    class="input-value"
+                    type={item.type}
+                    checked={this.controlled.extra[item.name]}
+                    value={this.controlled.extra[item.name]}
+                  />
+                </div>
+              )
+            })}
       </div>
     )
   },
