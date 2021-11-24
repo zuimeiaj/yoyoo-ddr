@@ -70,6 +70,14 @@ export default {
       type: Array,
       default: () => [1, 1],
     },
+    stop: {
+      default: true,
+      type: Boolean,
+    },
+    prevent: {
+      default: true,
+      type: Boolean,
+    },
     axis: {
       type: String,
       default: 'xy', // x | y 不填写则都可以移动，仅移动时生效
@@ -111,6 +119,14 @@ export default {
     },
   },
   methods: {
+    handleDefaultEvent(e) {
+      if (this.stop) {
+        e.stopPropagation()
+      }
+      if (this.prevent) {
+        e.preventDefault()
+      }
+    },
     getNewHandler(type) {
       let cursor = getHandler(type, this.transform.rotation)
       let { handlerSize } = this
@@ -160,6 +176,7 @@ export default {
     },
     handleMouseDown(event) {
       if (!this.active && !this.beforeActive(this.id)) return
+      this.handleDefaultEvent(event)
       let point = event.touches ? event.touches[0] : event
       let { clientX, clientY } = point
       this._lastX = clientX
@@ -212,6 +229,7 @@ export default {
       }
     },
     handleMouseMove(event) {
+      this.handleDefaultEvent(event)
       let { clientX, clientY } = event.touches ? event.touches[0] : event
       this.isReadyToDrag = false
       this.isReadyToResize = false
@@ -286,6 +304,7 @@ export default {
       return w
     },
     handleMouseUp(event) {
+      this.handleDefaultEvent(event)
       document.removeEventListener('mousemove', this.handleMouseMove, false)
       document.removeEventListener('mouseup', this.handleMouseUp, false)
       document.removeEventListener('touchmove', this.handleMouseMove, false)
@@ -315,14 +334,16 @@ export default {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
       let x1 = clientX - this._parentRect.left - opp2.x
       let y1 = clientY - this._parentRect.top - opp2.y
-      let _width = rect.width,
-        _height = rect.height
+      let width = rect.width
+      let height = rect.height
+      let distance = Math.hypot(y1, x1)
+      // 有问题
       if (tr2bl[type]) {
-        if (widthMap[type]) _height /= 2
-        pressAngle = rad2deg(Math.atan2(_width, _height))
+        height = Math.sqrt(Math.pow(distance, 2) - Math.pow(rect.width, 2))
+        pressAngle = rad2deg(Math.atan2(width, height))
       } else {
-        if (heightMap[type]) _width /= 2
-        pressAngle = rad2deg(Math.atan2(_height, _width))
+        width = Math.sqrt(Math.pow(distance, 2) - Math.pow(rect.height, 2))
+        pressAngle = rad2deg(Math.atan2(height, width))
       }
       let startAngle = rad2deg(Math.atan2(y1, x1))
       this._resizeOpt = {
@@ -519,6 +540,12 @@ export default {
     > .rotate-handler {
       display: inline-block;
     }
+  }
+  .br,
+  .tr,
+  .tl,
+  .bl {
+    background: #607d8b;
   }
 }
 </style>

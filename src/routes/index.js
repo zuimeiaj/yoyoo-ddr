@@ -14,4 +14,8 @@ export default [
     path: '/restrict',
     component: () => import('@/examples/restrict'),
   },
+  {
+    path: '/demos',
+    component: () => import('@/examples/demos'),
+  },
 ]

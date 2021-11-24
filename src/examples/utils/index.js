@@ -50,6 +50,24 @@ export function findComponent(array, fn) {
   return findComponent(array)
 }
 
+export function deepCopyComponent(item) {
+  item = JSON.parse(JSON.stringify(item))
+
+  const setNewId = (item) => {
+    item.id =
+      Date.now() +
+      Math.random()
+        .toString()
+        .slice(2)
+    if (item.children) {
+      item.children.forEach(setNewId)
+    }
+  }
+
+  setNewId(item)
+  return item
+}
+
 /**
  *
  * 基于不可变数据结构，只修改指定路径下的对象。如果回调函数返回false表示删除该路径对应的对象

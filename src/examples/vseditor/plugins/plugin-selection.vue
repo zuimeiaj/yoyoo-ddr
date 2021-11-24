@@ -4,6 +4,7 @@ import DDrComponent from '@/components/ddr'
 import { EVENT_COMPONENT_UNSELECT } from '../event-enums'
 import { getComponentRef, getComponentRefsById } from '@/examples/utils/ref'
 import { getBoundingRect } from '@/components/ddr/helper'
+import { selectionActionHandlers } from './plugin-selection-actions'
 /**
  * @description
  *  1、为编辑器增加批量选择功能
@@ -104,51 +105,19 @@ export default {
         height: bottom - top,
         rotation: 0,
       }
+      this.getSelectedComponentRefs(ids, this.selectionTransform)
+    },
+    getSelectedComponentRefs(ids, { x, y, width, height }) {
       this.componentRefs = getComponentRefsById(ids).map((item) => {
         // 记录组件在选区的位置和宽度百分比
-        item._xPercent = (item.transform.x - left) / (right - left)
-        item._yPercent = (item.transform.y - top) / (bottom - top)
-        item._wPercent = item.transform.width / (right - left)
-        item._hPercent = item.transform.height / (bottom - top)
+        item._xPercent = (item.transform.x - x) / width
+        item._yPercent = (item.transform.y - y) / height
+        item._wPercent = item.transform.width / width
+        item._hPercent = item.transform.height / height
         return item
       })
     },
-    handleSelectionDrag(e) {
-      e.stopPropagation()
-      this.componentRefs.forEach((item) => {
-        item.transform.x += this.$refs.ddr._deltaX
-        item.transform.y += this.$refs.ddr._deltaY
-      })
-      this.selectedComponents = this.selectedComponents.map((item) => {
-        let t = getComponentRef(item.id).transform
-        item.x = t.x
-        item.y = t.y
-        return item
-      })
-    },
-    stopPropagation(e) {
-      e.stopPropagation()
-    },
-    handleSelectionDragEnd(e) {
-      e.stopPropagation()
-      let changes = {}
-      this.componentRefs.forEach((item) => {
-        changes[item.id] = {
-          key: 'transform',
-          value: { ...item.transform },
-        }
-      })
-      this.application.batchUpdateControlValue(changes)
-    },
-    handleSelectionResize(e) {
-      e.stopPropagation()
-      let area = this.$refs.ddr.transform
-      this.componentRefs.forEach((item) => {
-        item.transform.x = Math.round(area.x + area.width * item._xPercent)
-        item.transform.y = Math.round(area.y + area.height * item._yPercent)
-        item.transform.width = Math.round(area.width * item._wPercent)
-        item.transform.height = Math.round(area.height * item._hPercent)
-      })
+    getSelectedComponentTransform() {
       this.selectedComponents = this.selectedComponents.map((item) => {
         let t = getComponentRef(item.id).transform
         item.x = t.x
@@ -158,9 +127,45 @@ export default {
         return item
       })
     },
+    handleSelectionDrag(e) {
+      e.stopPropagation()
+      this.componentRefs.forEach((item) => {
+        item.transform.x += this.$refs.ddr._deltaX
+        item.transform.y += this.$refs.ddr._deltaY
+      })
+      this.getSelectedComponentTransform()
+    },
+    stopPropagation(e) {
+      e.stopPropagation()
+    },
+    handleSelectionDragEnd(e, transform) {
+      e.stopPropagation()
+      let changes = {}
+      this.componentRefs.forEach((item) => {
+        changes[item.id] = {
+          key: 'transform',
+          value: { ...item.transform },
+        }
+      })
+      this.selectionTransform = transform
+      this.application.batchUpdateControlValue(changes)
+    },
+
+    handleSelectionResize(e) {
+      e.stopPropagation()
+      let area = this.$refs.ddr.transform
+      this.componentRefs.forEach((item) => {
+        item.transform.x = Math.round(area.x + area.width * item._xPercent)
+        item.transform.y = Math.round(area.y + area.height * item._yPercent)
+        item.transform.width = Math.round(area.width * item._wPercent)
+        item.transform.height = Math.round(area.height * item._hPercent)
+      })
+      this.getSelectedComponentTransform()
+    },
   },
 
   mounted() {
+    this.componentRefs = []
     let element = this.application.getEditorView().getWrapperElement()
 
     Interaction.init(element, {
@@ -174,14 +179,7 @@ export default {
         this.handleSelectionEnd()
       },
     })
-
-    document.addEventListener('mousedown', (e) => {
-      if (e.target.dataset.action === 'delete') {
-        if (this.componentRefs.length > 1)
-          this.application.batchDeleteControls(this.componentRefs.map((item) => item.id))
-      }
-      this.selectionActive = false
-    })
+    document.addEventListener('mousedown', selectionActionHandlers.bind(this))
   },
   render() {
     const { x, y, width, height } = this.selectionArea

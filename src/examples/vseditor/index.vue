@@ -10,7 +10,7 @@ import {
 } from '@/examples/vseditor/event-enums'
 import FooterVue from '@/examples/vseditor/footer.vue'
 import HeaderVue from '@/examples/vseditor/header.vue'
-import { batchUpdateIn, findComponent, findComponentPathById, updateTreeIn } from '@/examples/utils'
+import { batchUpdateIn, deepCopyComponent, findComponent, findComponentPathById, updateTreeIn } from '@/examples/utils'
 import PropInspectorVue from '@/examples/vseditor/prop-inspector.vue'
 import PluginSelectionVue from '@/examples/vseditor/plugins/plugin-selection.vue'
 import PluginGridVue from '@/examples/vseditor/plugins/plugin-grid.vue'
@@ -222,6 +222,45 @@ export default {
       this.setControls(controls)
       this.clearCurrentComponent()
     },
+    duplicateComponent() {
+      if (!this.currentId) {
+        return
+      }
+
+      let pathes = this.currentPath.slice()
+      let selectedIndex = pathes.pop()
+
+      let controls = []
+      let component = null
+      const newComponent = (item) => {
+        // 深度拷贝，粗暴！！
+        let copyOfSelected = deepCopyComponent(item)
+        let t = copyOfSelected.transform
+        copyOfSelected.transform = {
+          x: t.x,
+          y: t.y + t.height,
+          width: t.width,
+          height: t.height,
+          rotation: t.rotation,
+        }
+        component = copyOfSelected
+        return copyOfSelected
+      }
+      if (pathes.length > 0) {
+        controls = updateTreeIn(this.controls, pathes, (item) => {
+          let children = item.children.slice()
+          let copyOfSelected = newComponent(children[selectedIndex])
+          children.splice(selectedIndex + 1, 0, copyOfSelected)
+          item.children = children
+          return item
+        })
+      } else {
+        controls = this.controls.slice()
+        controls.splice(selectedIndex + 1, 0, newComponent(this.controls[selectedIndex]))
+      }
+      this.setControls(controls)
+      this.setCurrentControl(component)
+    },
     handleClear() {
       this.setControls([])
       this.clearCurrentComponent()
@@ -258,6 +297,7 @@ export default {
           onRedo={this.handleRedo}
           onClear={this.handleClear}
           onDelete={this.deleteComponent}
+          onDuplicate={this.duplicateComponent}
         />
         <div class="content">
           <ComponentsVue />

@@ -12,6 +12,9 @@ export default {
           <button title="Return to the next state" data-action="redo" onClick={() => this.$emit('redo')}>
             Redo
           </button>
+          <button title="Duplicate selected component" data-action="duplicate" onClick={() => this.$emit('duplicate')}>
+            Duplicate
+          </button>
           <button title="Delete selected component" data-action="delete" onClick={() => this.$emit('delete')}>
             Delete
           </button>
