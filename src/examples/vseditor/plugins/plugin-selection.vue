@@ -4,7 +4,7 @@ import DDrComponent from '@/components/ddr'
 import { EVENT_COMPONENT_UNSELECT } from '../event-enums'
 import { getComponentRef, getComponentRefsById } from '@/examples/utils/ref'
 import { getBoundingRect } from '@/components/ddr/helper'
-import { selectionActionHandlers } from './plugin-selection-actions'
+import { registerSelectionActions } from './plugin-selection-actions'
 /**
  * @description
  *  1、为编辑器增加批量选择功能
@@ -20,6 +20,7 @@ export default {
   },
   data() {
     return {
+      grid: [1, 1],
       selectedComponents: [],
       selectionTransform: { x: 0, y: 0, width: 0, height: 0, rotation: 0 },
       selectionActive: false,
@@ -130,9 +131,10 @@ export default {
     },
     handleSelectionDrag(e) {
       e.stopPropagation()
+      let area = this.$refs.ddr.transform
       this.componentRefs.forEach((item) => {
-        item.transform.x += this.$refs.ddr._deltaX
-        item.transform.y += this.$refs.ddr._deltaY
+        item.transform.x = Math.round(area.x + area.width * item._xPercent)
+        item.transform.y = Math.round(area.y + area.height * item._yPercent)
       })
       this.getSelectedComponentTransform()
     },
@@ -180,7 +182,8 @@ export default {
         this.handleSelectionEnd()
       },
     })
-    document.addEventListener('mousedown', selectionActionHandlers.bind(this))
+    // register
+    registerSelectionActions(this)
   },
   render() {
     const { x, y, width, height } = this.selectionArea
@@ -214,6 +217,7 @@ export default {
           ref="ddr"
           data-component="true"
           rotatable={false}
+          grid={this.grid}
           resizeHandler={this.selectionHandler}
           active={this.selectionActive}
           onDragstart={this.stopPropagation}

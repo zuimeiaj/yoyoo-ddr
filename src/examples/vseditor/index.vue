@@ -1,19 +1,31 @@
 <script>
 import ComponentsVue from '@/examples/vseditor/components.vue'
 import EditorViewVue from '@/examples/vseditor/editor-view.vue'
-
 import {
+  EVENT_APPLICATION_CLEAR,
+  EVENT_APPLICATION_REDO,
+  EVENT_APPLICATION_UNDO,
   EVENT_COMPONENT_ADD,
+  EVENT_COMPONENT_DELETE,
+  EVENT_COMPONENT_DUPLICATE,
   EVENT_COMPONENT_SELECT,
   EVENT_COMPONENT_TRANSFORM,
   EVENT_COMPONENT_UNSELECT,
 } from '@/examples/vseditor/event-enums'
 import FooterVue from '@/examples/vseditor/footer.vue'
 import HeaderVue from '@/examples/vseditor/header.vue'
-import { batchUpdateIn, deepCopyComponent, findComponent, findComponentPathById, updateTreeIn } from '@/examples/utils'
+import {
+  batchUpdateIn,
+  deepCopyComponent,
+  findComponent,
+  findComponentPathById,
+  generateId,
+  updateTreeIn,
+} from '@/examples/utils'
 import PropInspectorVue from '@/examples/vseditor/prop-inspector.vue'
 import PluginSelectionVue from '@/examples/vseditor/plugins/plugin-selection.vue'
 import PluginGridVue from '@/examples/vseditor/plugins/plugin-grid.vue'
+import { registerKeyboardAction } from '@/examples/vseditor/plugins/keyboard'
 const historys = []
 const redoHistorys = []
 export default {
@@ -31,11 +43,7 @@ export default {
       return components.map((item) => ({
         type: item.type,
         children: item.type === 'container' ? [] : void 0,
-        id:
-          Date.now() +
-          Math.random()
-            .toString()
-            .slice(2),
+        id: generateId(),
         transform: {
           x: item.x - (item.x % 10),
           y: item.y - (item.y % 10),
@@ -291,17 +299,19 @@ export default {
     this.eventbus.$on(EVENT_COMPONENT_SELECT, this.handleSelect)
     this.eventbus.$on(EVENT_COMPONENT_TRANSFORM, this.handleTransform)
     this.eventbus.$on(EVENT_COMPONENT_UNSELECT, this.handleUnselect)
+    this.eventbus.$on(EVENT_COMPONENT_DUPLICATE, this.duplicateComponent)
+    this.eventbus.$on(EVENT_COMPONENT_DELETE, this.deleteComponent)
+    this.eventbus.$on(EVENT_APPLICATION_REDO, this.handleRedo)
+    this.eventbus.$on(EVENT_APPLICATION_UNDO, this.handleUndo)
+    this.eventbus.$on(EVENT_APPLICATION_CLEAR, this.handleClear)
+
+    // 绑定键盘按钮事件
+    registerKeyboardAction(this)
   },
   render() {
     return (
       <div class="vs-editor-app">
-        <HeaderVue
-          onUndo={this.handleUndo}
-          onRedo={this.handleRedo}
-          onClear={this.handleClear}
-          onDelete={this.deleteComponent}
-          onDuplicate={this.duplicateComponent}
-        />
+        <HeaderVue />
         <div class="content">
           <ComponentsVue />
           <EditorViewVue ref="editor" value={this.controls}>

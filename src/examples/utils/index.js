@@ -54,11 +54,7 @@ export function deepCopyComponent(item) {
   item = JSON.parse(JSON.stringify(item))
 
   const setNewId = (item) => {
-    item.id =
-      Date.now() +
-      Math.random()
-        .toString()
-        .slice(2)
+    item.id = generateId()
     if (item.children) {
       item.children.forEach(setNewId)
     }
@@ -124,4 +120,17 @@ export function batchUpdateIn(array, ids, callback) {
       return item
     })
     .filter(Boolean)
+}
+
+/**
+ *
+ * @returns {string}
+ */
+export function generateId() {
+  return (
+    Date.now() +
+    Math.random()
+      .toString()
+      .slice(2)
+  )
 }

@@ -336,14 +336,11 @@ export default {
       let y1 = clientY - this._parentRect.top - opp2.y
       let width = rect.width
       let height = rect.height
-      let distance = Math.hypot(y1, x1)
       // 有问题
       if (tr2bl[type]) {
-        height = Math.sqrt(Math.pow(distance, 2) - Math.pow(rect.width, 2))
-        pressAngle = rad2deg(Math.atan2(width, height))
+        pressAngle = rad2deg(Math.atan2(width, widthMap[type] ? height / 2 : height))
       } else {
-        width = Math.sqrt(Math.pow(distance, 2) - Math.pow(rect.height, 2))
-        pressAngle = rad2deg(Math.atan2(height, width))
+        pressAngle = rad2deg(Math.atan2(height, heightMap[type] ? width / 2 : width))
       }
       let startAngle = rad2deg(Math.atan2(y1, x1))
       this._resizeOpt = {
@@ -425,6 +422,7 @@ export default {
 
       // 限制在父元素中
       transform.height = this.restrictHeight(transform.height, resizeType)
+
       transform.width = this.restrictWidth(transform.width, resizeType)
       // 根据新的旋转和宽高计算新的位置
       let matrix = getPoints(transform)

@@ -1,4 +1,11 @@
 <script>
+import {
+  EVENT_APPLICATION_CLEAR,
+  EVENT_APPLICATION_REDO,
+  EVENT_APPLICATION_UNDO,
+  EVENT_COMPONENT_DELETE,
+  EVENT_COMPONENT_DUPLICATE,
+} from './event-enums'
 export default {
   methods: {},
   render() {
@@ -6,22 +13,38 @@ export default {
       <div class="vs-header">
         <h1>DEMO Project</h1>
         <div class="header-actions">
-          <button title="Return to the previous state" data-action="undo" onClick={() => this.$emit('undo')}>
+          <button
+            title="Return to the previous state"
+            data-action="undo"
+            onClick={() => this.eventbus.$emit(EVENT_APPLICATION_UNDO)}
+          >
             Undo
           </button>
-          <button title="Return to the next state" data-action="redo" onClick={() => this.$emit('redo')}>
+          <button
+            title="Return to the next state"
+            data-action="redo"
+            onClick={() => this.eventbus.$emit(EVENT_APPLICATION_REDO)}
+          >
             Redo
           </button>
-          <button title="Duplicate selected component" data-action="duplicate" onClick={() => this.$emit('duplicate')}>
+          <button
+            title="Duplicate selected component"
+            data-action="duplicate"
+            onClick={() => this.eventbus.$emit(EVENT_COMPONENT_DUPLICATE)}
+          >
             Duplicate
           </button>
-          <button title="Delete selected component" data-action="delete" onClick={() => this.$emit('delete')}>
+          <button
+            title="Delete selected component"
+            data-action="delete"
+            onClick={() => this.eventbus.$emit(EVENT_COMPONENT_DELETE)}
+          >
             Delete
           </button>
           <button
             title="Clear all components in the editing area"
             data-action="clear"
-            onClick={() => this.$emit('clear')}
+            onClick={() => this.eventbus.$emit(EVENT_APPLICATION_CLEAR)}
           >
             Clear
           </button>
