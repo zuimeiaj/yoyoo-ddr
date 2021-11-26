@@ -17,10 +17,11 @@ const keyboardActions = [
 export const registerKeyboardAction = (application) => {
   keyboardActions.forEach((item) => {
     keyboardJS.bind(item.keys, (e) => {
-      e.stopPropagation()
-      e.preventDefault()
-      application.eventbus.$emit(item.action)
-      return false
+      // 忽略输入框
+      if (!['input', 'textarea'].includes(e.target.tagName.toLowerCase())) {
+        e.preventDefault()
+        application.eventbus.$emit(item.action)
+      }
     })
   })
 }
