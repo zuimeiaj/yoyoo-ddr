@@ -57,7 +57,7 @@ export default {
         resizable: true,
         draggable: true,
         acceptRatio: false,
-        zoom: 1,
+        zoom: 2,
         active: false,
         parent: true,
         parentId,

@@ -260,7 +260,7 @@ export default {
 
     doMove() {
       let [gridX, gridY] = this.grid
-
+      console.log(1)
       let deltaX = this._deltaX / this.zoom
       let deltaY = this._deltaY / this.zoom
       let x = (this.localeTransform.x = Math.round(this.localeTransform.x + deltaX))
