@@ -138,8 +138,6 @@ export default {
 
 ### Possible problems
 
-- If the container uses `transform:scale(2)`, the position of the component will be wrong
-- Based on vue 2 , does not support vue3
 - If the container uses `overflow:scroll`, it will also cause the component to be in the wrong position when dragging.
 
 ### Props
@@ -365,6 +363,22 @@ Example:
 
 ```js
 <DDR axis="x" />
+```
+
+#### zoom
+
+Type: `Number`<br>
+Defaults: `1`<br>
+Required: `false`<br>
+
+When the parent container uses `transform: scale()`, the zoom value of the component should be consistent with the scale
+
+Example:
+
+```js
+<div style={'transform:scale(1.5)'}>
+  <DDR zoom={1.5}>
+</div>
 ```
 
 #### id

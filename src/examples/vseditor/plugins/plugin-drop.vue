@@ -30,8 +30,8 @@ export default {
       // App.vue中添加到<EditorView></EditorView> 的插件仅提供给应用的顶层编辑视图
       let rect = this.$parent.getWrapperElement().getBoundingClientRect()
       let coords = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
+        x: (e.clientX - rect.left) / 1.5,
+        y: (e.clientY - rect.top) / 1.5,
       }
 
       if (files.length > 0) {

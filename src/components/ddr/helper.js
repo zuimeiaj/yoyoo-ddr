@@ -49,10 +49,10 @@ export function rad2deg(rad) {
 }
 
 // 获取矩形旋转后在平面上的8个坐标点，从左上角顺时针放到数组里返回
-export function getPoints({ x, y, width, height, rotation }) {
+export function getPoints({ x, y, width, height, rotation }, zoom) {
   let a = (rotation * Math.PI) / 180
-  let wc = width / 2
-  let hc = height / 2
+  let wc = (width / 2) * zoom
+  let hc = (height / 2) * zoom
   // 标准的矩阵点乘公式，返回旋转后的坐标
   let deg = new Matrix([[Math.cos(a), Math.sin(a)], [-Math.sin(a), Math.cos(a)]])
   let rect = new Matrix([[-wc, hc], [0, hc], [wc, hc], [wc, 0], [wc, -hc], [0, -hc], [-wc, -hc], [-wc, 0]])
@@ -61,7 +61,7 @@ export function getPoints({ x, y, width, height, rotation }) {
     .T()
     .valueOf()
     .map((item) => {
-      return { x: item[0] + wc + x, y: -(item[1] - hc) + y }
+      return { x: item[0] + wc + x * zoom, y: -(item[1] - hc) + y * zoom }
     })
 }
 export function getBoundingRect(transform) {

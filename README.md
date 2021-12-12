@@ -166,6 +166,7 @@ export default {
 | value         | Object   | {x:0,y:0,width:100,height:100,rotation:0} | 位置，注意该参数并不是双向绑定的不支持 v-model，但能响应 value 的更新                |
 | grid          | Array    | [1,1]                                     | 格式[x,y]，支持拖动和缩放对齐。只能为整数                                            |
 | axis          | String   | 'xy'                                      | 指定坐标轴拖动，默认 xy 都可以拖动，仅支持拖动                                       |
+| zoom          | Number   | 1                                         | 父容器缩放，当拖拽元素的父元素使用 transform：scale 后，应该同步给此属性             |
 | id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                   |
 | beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入 id                        |
 | renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot 就行了 |

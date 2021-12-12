@@ -39,7 +39,7 @@ export default {
     }
   },
   methods: {
-    getComponents(components) {
+    getComponents(components, parentId) {
       return components.map((item) => ({
         type: item.type,
         children: item.type === 'container' ? [] : void 0,
@@ -57,11 +57,13 @@ export default {
         resizable: true,
         draggable: true,
         acceptRatio: false,
+        zoom: 1,
         active: false,
         parent: true,
+        parentId,
         resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
         extra: item,
-        grid: [10, 10],
+        grid: [1, 1],
         axis: 'xy',
       }))
     },
@@ -71,7 +73,7 @@ export default {
      */
     addControl({ components, parentId }) {
       let controls = []
-      let newComponents = this.getComponents(components)
+      let newComponents = this.getComponents(components, parentId)
       if (parentId) {
         const { path } = findComponentPathById(this.controls, parentId)
         controls = updateTreeIn(this.controls, path, (item) => {
@@ -340,8 +342,8 @@ export default {
     .vs-editor {
       flex: 1;
       position: relative;
-      overflow: hidden;
       width: 100%;
+      overflow: scroll;
       height: 100%;
     }
   }

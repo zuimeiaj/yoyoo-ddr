@@ -78,6 +78,10 @@ export default {
       default: true,
       type: Boolean,
     },
+    zoom: {
+      default: 1,
+      type: Number,
+    },
     axis: {
       type: String,
       default: 'xy', // x | y 不填写则都可以移动，仅移动时生效
@@ -108,7 +112,7 @@ export default {
 
   computed: {
     rotateHandler() {
-      let size = Math.ceil(this.handlerSize) + 'px'
+      let size = Math.ceil(this.handlerSize / this.zoom) + 'px'
       return `width:${size};height:${size};top:-25px;margin-left:${-Math.floor(this.handlerSize / 2)}px`
     },
     style() {
@@ -163,8 +167,8 @@ export default {
       }
       let result = {
         cursor: cursor + '-resize',
-        width: Math.ceil(handlerSize) + 'px',
-        height: Math.ceil(handlerSize) + 'px',
+        width: Math.ceil(handlerSize / this.zoom) + 'px',
+        height: Math.ceil(handlerSize / this.zoom) + 'px',
         ...props,
       }
       return Object.keys(result)
@@ -189,14 +193,14 @@ export default {
       // 计算组件的边界，在移动时进行判断并修正
       if (this.parent) {
         let minLeft = 0
-        let maxLeft = this._parentRect.width - this.transform.width
+        let maxLeft = this._parentRect.width / this.zoom - this.transform.width
         let minTop = 0
-        let maxTop = this._parentRect.height - this.transform.height
+        let maxTop = this._parentRect.height / this.zoom - this.transform.height
         let maxLeftWidth = this.transform.x + this.transform.width
-        let maxRightWidth = this._parentRect.width - this.transform.x
+        let maxRightWidth = this._parentRect.width / this.zoom - this.transform.x
         let maxTopHeight = this.transform.y + this.transform.height
-        let maxBottomHeight = this._parentRect.height - this.transform.y
-        this.minBoundary = {
+        let maxBottomHeight = this._parentRect.height / this.zoom - this.transform.y
+        this.bounday = {
           minLeft,
           maxLeft,
           minTop,
@@ -253,10 +257,12 @@ export default {
       }
       this.emitChange()
     },
+
     doMove() {
       let [gridX, gridY] = this.grid
-      let deltaX = this._deltaX
-      let deltaY = this._deltaY
+
+      let deltaX = this._deltaX / this.zoom
+      let deltaY = this._deltaY / this.zoom
       let x = (this.localeTransform.x = Math.round(this.localeTransform.x + deltaX))
       let y = (this.localeTransform.y = Math.round(this.localeTransform.y + deltaY))
 
@@ -264,43 +270,43 @@ export default {
       // 当deltaX > 0 说明当前移动方向为向右移动，则向下取整。例如：10 12 14 始终取 10
       // 当deltaY < 0 说明当干移动方向为向左移动，则向上取整。例如：20 19 17 始终取 20
       if (this.axis.includes('x')) {
-        if (deltaX > 0) {
+        if (x > this.transform.x) {
           this.transform.x = this.restrictToLeftOfParent(x - (x % gridX))
-        } else if (deltaX < 0) {
+        } else if (x < this.transform.x) {
           this.transform.x = this.restrictToLeftOfParent(x - ((x % gridX) - gridX))
         }
       }
 
       if (this.axis.includes('y')) {
-        if (deltaY > 0) {
+        if (y > this.transform.y) {
           this.transform.y = this.restrictToTopOfParent(y - (y % gridY))
-        } else if (deltaY < 0) {
+        } else if (y < this.transform.y) {
           this.transform.y = this.restrictToTopOfParent(y - ((y % gridY) - gridY))
         }
       }
     },
     restrictToLeftOfParent(x) {
       if (!this.parent) return x
-      x = Math.max(this.minBoundary.minLeft, x)
-      x = Math.min(this.minBoundary.maxLeft, x)
+      x = Math.max(this.bounday.minLeft, x)
+      x = Math.min(this.bounday.maxLeft, x)
       return x
     },
     restrictToTopOfParent(y) {
       if (!this.parent) return y
-      y = Math.max(this.minBoundary.minTop, y)
-      y = Math.min(this.minBoundary.maxTop, y)
+      y = Math.max(this.bounday.minTop, y)
+      y = Math.min(this.bounday.maxTop, y)
       return y
     },
     restrictHeight(h, type) {
       if (!this.parent || this.transform.rotation > 0) return h
-      if (['bl', 'bm', 'br'].includes(type)) return Math.min(this.minBoundary.maxBottomHeight, h)
-      if (['tl', 'tm', 'tr'].includes(type)) return Math.min(this.minBoundary.maxTopHeight, h)
+      if (['bl', 'bm', 'br'].includes(type)) return Math.min(this.bounday.maxBottomHeight, h)
+      if (['tl', 'tm', 'tr'].includes(type)) return Math.min(this.bounday.maxTopHeight, h)
       return h
     },
     restrictWidth(w, type) {
       if (!this.parent || this.transform.rotation > 0) return w
-      if (['tl', 'l', 'bl'].includes(type)) return Math.min(this.minBoundary.maxLeftWidth, w)
-      if (['tr', 'r', 'br'].includes(type)) return Math.min(this.minBoundary.maxRightWidth, w)
+      if (['tl', 'l', 'bl'].includes(type)) return Math.min(this.bounday.maxLeftWidth, w)
+      if (['tr', 'r', 'br'].includes(type)) return Math.min(this.bounday.maxRightWidth, w)
       return w
     },
     handleMouseUp(event) {
@@ -323,7 +329,7 @@ export default {
     handleResizeStart(event) {
       let type = this._resizeHandler
       let rect = this.transform
-      let matrix = getPoints(rect)
+      let matrix = getPoints(rect, this.zoom)
       let pressAngle
       // 当前控制点的对角坐标点，该坐标会用来计算新的位置
       // 例如：bottomRight(右下角) 对应 topLeft(左上角)
@@ -386,9 +392,11 @@ export default {
         if (widthMap[type]) h = w / this.currentRatio
         else w = h * this.currentRatio
       }
+      // 还原到实际尺寸
+      w /= this.zoom
+      h /= this.zoom
       w = Math.min(Math.max(Math.round(w), this.minWidth), this.maxWidth)
       h = Math.min(Math.max(Math.round(h), this.minHeight), this.maxHeight)
-
       // 判断当前控制点是否为宽度缩放还是高度缩放
       if (widthMap[type] && !ratio) {
         transform.width = w
@@ -400,7 +408,7 @@ export default {
       }
 
       let resizeType = this._resizeHandler
-      // 限制在网格中移动，原理同拖动
+      // // 限制在网格中移动，原理同拖动
       if (transform.width % gridX > 0) {
         if (transform.width > this.localeTransform.width) {
           // 宽度变大时向下取整
@@ -419,16 +427,15 @@ export default {
           transform.height = transform.height - ((transform.height % gridY) - gridY)
         }
       }
-
       // 限制在父元素中
       transform.height = this.restrictHeight(transform.height, resizeType)
-
       transform.width = this.restrictWidth(transform.width, resizeType)
+
       // 根据新的旋转和宽高计算新的位置
-      let matrix = getPoints(transform)
+      let matrix = getPoints(transform, this.zoom)
       let newOpposite = matrix[pointMap[type]]
-      let deltaX = -(newOpposite.x - opposite.x)
-      let deltaY = -(newOpposite.y - opposite.y)
+      let deltaX = -(newOpposite.x - opposite.x) / this.zoom
+      let deltaY = -(newOpposite.y - opposite.y) / this.zoom
       transform.x = Math.round(transform.x + deltaX)
       transform.y = Math.round(transform.y + deltaY)
       this.transform = transform

@@ -71,7 +71,6 @@ export default {
   render() {
     let item = this.item
     // eslint-disable-next-line no-console
-    console.log('render component:', this.item.id)
     return (
       <DragCell
         ref="cell"
@@ -90,6 +89,7 @@ export default {
         minHeight={item.minHeight}
         active={item.active}
         value={item.transform}
+        zoom={item.zoom}
         beforeActive={this.beforeActive1}
         onDragstart={this.handleDragStart}
         onDrag={this.handleDrag}
