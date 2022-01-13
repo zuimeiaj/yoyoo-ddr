@@ -26,7 +26,7 @@ import PropInspectorVue from '@/examples/vseditor/prop-inspector.vue'
 import PluginSelectionVue from '@/examples/vseditor/plugins/plugin-selection.vue'
 import PluginGridVue from '@/examples/vseditor/plugins/plugin-grid.vue'
 import { registerKeyboardAction } from '@/examples/vseditor/plugins/keyboard'
-let historys = []
+let historys = [[]]
 let historyPointer = 0
 export default {
   name: 'app',
