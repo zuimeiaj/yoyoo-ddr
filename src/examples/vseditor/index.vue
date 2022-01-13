@@ -26,8 +26,8 @@ import PropInspectorVue from '@/examples/vseditor/prop-inspector.vue'
 import PluginSelectionVue from '@/examples/vseditor/plugins/plugin-selection.vue'
 import PluginGridVue from '@/examples/vseditor/plugins/plugin-grid.vue'
 import { registerKeyboardAction } from '@/examples/vseditor/plugins/keyboard'
-const historys = []
-const redoHistorys = []
+let historys = []
+let historyPointer = 0
 export default {
   name: 'app',
   data() {
@@ -57,13 +57,13 @@ export default {
         resizable: true,
         draggable: true,
         acceptRatio: false,
-        zoom: 2,
+        zoom: 1,
         active: false,
         parent: true,
         parentId,
         resizeHandler: ['tl', 'tm', 'tr', 'r', 'br', 'bm', 'l', 'bl'],
         extra: item,
-        grid: [1, 1],
+        grid: [10, 10],
         axis: 'xy',
       }))
     },
@@ -202,7 +202,11 @@ export default {
     },
     setControls(controls, needRecordHistory = true) {
       this.controls = controls
-      if (needRecordHistory) historys.push(this.controls)
+      if (needRecordHistory) {
+        historys = historys.slice(0, historyPointer + 1)
+        historys.push(this.controls)
+        historyPointer = historys.length - 1
+      }
     },
     /**
      * @description 清空选中状态
@@ -212,17 +216,17 @@ export default {
       this.currentId = ''
       this.currentPath = []
     },
+    initFromHistory(bounce) {
+      historyPointer += bounce
+      let controls = historys[historyPointer]
+      this.controls = controls
+    },
     // Actions
     handleUndo() {
-      if (historys.length == 0) return
+      if (historyPointer == 0) return
       this.clearCurrentComponent()
-      let last = historys.pop()
-      let cur = historys[historys.length - 1] || []
-      this.controls = cur
-      redoHistorys.push(last)
-      if (cur) {
-        this.setCurrentControl(this.getActiveComponent(this.controls))
-      }
+      this.initFromHistory(-1)
+      this.setCurrentControl(this.getActiveComponent(this.controls))
     },
     /**
      * @description 删除当前选中的组件
@@ -280,11 +284,10 @@ export default {
     },
 
     handleRedo() {
-      if (redoHistorys.length === 0) return
-      let contrls = redoHistorys.pop()
+      if (historyPointer === historys.length - 1) return
+      this.initFromHistory(1)
       this.clearCurrentComponent()
-      this.setControls(contrls)
-      this.setCurrentControl(this.getActiveComponent(contrls))
+      this.setCurrentControl(this.getActiveComponent(this.controls))
     },
     handleUnselect() {
       if (!this.currentId) return
