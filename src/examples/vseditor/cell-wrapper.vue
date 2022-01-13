@@ -1,5 +1,5 @@
 <script>
-import DragCell from '@/components/ddr'
+import DragCell from '@/components/ddr/index.vue'
 import { EVENT_COMPONENT_SELECT, EVENT_COMPONENT_TRANSFORM } from './event-enums'
 import ComponentImpl from './component-impl'
 import { saveComponentRef } from '@/examples/utils/ref'

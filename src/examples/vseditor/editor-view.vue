@@ -41,6 +41,7 @@ export default {
 }
 
 .root-editor > .vs-editor-canvas {
+  transform: scale(1);
   transform-origin: top left;
 }
 </style>
