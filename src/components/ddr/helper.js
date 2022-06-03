@@ -13,6 +13,17 @@ export const pointMap = {
   tr: 6,
   r: 7,
 }
+
+export const handlerPointMap = {
+  tl: 0,
+  tm: 1,
+  tr: 2,
+  r: 3,
+  br: 4,
+  bm: 5,
+  bl: 6,
+  l: 7,
+}
 // 计算矩形大小时使用四个直角坐标
 export const pointMap2 = {
   br: 0,

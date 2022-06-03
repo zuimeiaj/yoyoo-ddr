@@ -1,5 +1,16 @@
 <script>
-import { getHandler, getPoints, getSize, heightMap, pointMap, pointMap2, rad2deg, tr2bl, widthMap } from './helper'
+import {
+  getHandler,
+  getPoints,
+  getSize,
+  handlerPointMap,
+  heightMap,
+  pointMap,
+  pointMap2,
+  rad2deg,
+  tr2bl,
+  widthMap,
+} from './helper'
 
 export default {
   name: 'ddr',
@@ -337,8 +348,14 @@ export default {
       // 例如：例如：bottomRight 和 bottom 都对应 topLeft
       let opp2 = matrix[pointMap2[type]]
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let x1 = clientX - this._parentRect.left - opp2.x
-      let y1 = clientY - this._parentRect.top - opp2.y
+      // issues: https://github.com/zuimeiaj/yoyoo-ddr/issues/34
+      // 在进行缩放时，需要考虑鼠标位置距离拖拽点中心位置的偏移值，否则拖拽时会有抖动
+      let handlerPoint = matrix[handlerPointMap[type]]
+      let offsetX = clientX - handlerPoint.x
+      let offsetY = clientY - handlerPoint.y
+
+      let x1 = clientX - opp2.x - offsetX
+      let y1 = clientY - opp2.y - offsetY
       let width = rect.width
       let height = rect.height
       // 有问题
@@ -356,13 +373,15 @@ export default {
         opp2,
         pressAngle,
         startAngle,
+        offsetX,
+        offsetY,
       }
     },
     handleResizeMove(event) {
       let { clientX, clientY } = event.touches ? event.touches[0] : event
-      let { opposite, opp2, type, pressAngle, startAngle } = this._resizeOpt
-      let x = clientX - this._parentRect.left - opp2.x
-      let y = clientY - this._parentRect.top - opp2.y
+      let { opposite, opp2, type, pressAngle, startAngle, offsetX, offsetY } = this._resizeOpt
+      let x = clientX - opp2.x - offsetX
+      let y = clientY - opp2.y - offsetY
       let dis = Math.hypot(y, x)
       let ratio = event.shiftKey || this.acceptRatio
       let [gridX, gridY] = this.grid

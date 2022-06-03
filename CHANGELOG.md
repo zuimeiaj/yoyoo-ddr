@@ -1,3 +1,7 @@
+### [ v0.6.1] - 2022-06-03
+
+- 修复bug https://github.com/zuimeiaj/yoyoo-ddr/issues/34
+
 ### [ v0.6] - 2021-12-12
 
 - 添加新属性 `zoom`，支持父元素使用 transform:scale()。
