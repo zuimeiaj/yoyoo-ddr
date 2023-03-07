@@ -25,8 +25,8 @@ npm i yoyoo-ddr-vue3 --save
 [Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
 
 ```javascript
-import DDR from 'yoyoo-ddr'
-import 'yoyoo-ddr/dist/yoyoo-ddr.css'
+import DDR from 'yoyoo-ddr';
+import 'yoyoo-ddr/dist/yoyoo-ddr.css';
 
 // vue 3
 // import DDR from 'yoyoo-ddr-vue3'
@@ -36,17 +36,17 @@ export default {
   data() {
     return {
       transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
-    }
+    };
   },
   render() {
     // vue 3 使用 v-model:value={this.transform}
     return (
       <DDR v-model={this.transform}>
-        <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
+        <div style='background:red;width:100%;height:100%'>x={this.transform.x}</div>
       </DDR>
-    )
+    );
   },
-}
+};
 ```
 
 ### 在数组中使用
@@ -61,7 +61,7 @@ export default {
         { id: 3, active: false, transform: { x: 300, y: 100, width: 100, height: 100, rotation: 0 } },
         { id: 4, active: false, transform: { x: 400, y: 100, width: 100, height: 100, rotation: 0 } },
       ],
-    }
+    };
   },
   methods: {
     handleActive(id) {
@@ -69,16 +69,16 @@ export default {
       // 将数组内对应id的数据同步为true
       this.list = this.list.map((item) => {
         if (item.id === id) {
-          item = { ...item, active: true }
+          item = { ...item, active: true };
         } else if (item.active) {
-          item = { ...item, active: false }
+          item = { ...item, active: false };
         }
-        return item
-      })
-      return true
+        return item;
+      });
+      return true;
     },
     renderChild(item) {
-      return <div style="background:red;width:100%;height:100%">Child {item.id}</div>
+      return <div style='background:red;width:100%;height:100%'>Child {item.id}</div>;
     },
   },
   render() {
@@ -87,21 +87,12 @@ export default {
         {this.list.map((item) => {
           // 如果直接使用slot插入子组件的方式会导致全量更新
           // 可以使用 renderContent 函数，或者在对DDR组件进行一次包装来解决更新问题
-          return (
-            <DDR
-              beforeActive={this.handleActive}
-              active={item.active}
-              key={item.id}
-              id={item.id}
-              value={item.transform}
-              renderContent={this.renderChild}
-            />
-          )
+          return <DDR beforeActive={this.handleActive} active={item.active} key={item.id} id={item.id} value={item.transform} renderContent={this.renderChild} />;
         })}
       </div>
-    )
+    );
   },
-}
+};
 ```
 
 ### value 单向数据流
@@ -111,17 +102,17 @@ export default {
   data() {
     return {
       transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
-    }
+    };
   },
   methods: {
     handleDrag(event, transform) {
-      this.transform = transform
+      this.transform = transform;
     },
     handleResize(event, transform) {
-      this.transform = transform
+      this.transform = transform;
     },
     handleRotate(event, transform) {
-      this.transform = transform
+      this.transform = transform;
     },
   },
   render() {
@@ -129,11 +120,11 @@ export default {
     // 在大数组渲染下，建议在拖拽结束后进行一次数据同步。可参考Demo项目的数据同步
     return (
       <DDR onResize={this.handleResize} onRotate={this.handleRotate} onDrag={this.handleDrag} value={this.transform}>
-        <div style="background:red;width:100%;height:100%">child</div>
+        <div style='background:red;width:100%;height:100%'>child</div>
       </DDR>
-    )
+    );
   },
-}
+};
 ```
 
 ### 特色
@@ -168,6 +159,8 @@ export default {
 | id            | string   | undefined                                 | 数组方式渲染时增加的参数，提高性能                                                   |
 | beforeActive  | Function | ()=> false                                | 数组方式渲染时增加的参数，当元素被点击时会调用该函数并传入 id                        |
 | renderContent | Function | ()=> VNode                                | 数组方式渲染时增加的参数，用于渲染自定义子节点，如果是单个组件使用直接用 slot 就行了 |
+| prevent       | boolean  | true                                      | 是否阻止默认事件，默认为 true                                                        |
+| stop          | boolean  | true                                      | 是否阻止事件冒泡，默认为 true                                                        |
 
 ### 自定义 class 样式
 
