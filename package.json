@@ -1,6 +1,6 @@
 {
   "name": "yoyoo-ddr",
-  "version": "0.6.1",
+  "version": "0.7",
   "description": "Lightweight and no dependencies,use draggable, resizable, rotatable, configurable for vue component ",
   "private": false,
   "main": "dist/yoyoo-ddr.umd.min.js",

@@ -1,6 +1,11 @@
+### [ v0.7] - 2023-03-14
+
+- 调整 parent 属性的逻辑，拖动旋转或缩放时任意一个顶点触发父元素的边界则会停止缩放或旋转动作
+- 目前该功能任然有瑕疵，如果缩放速度过快，顶点可能还没有触碰到边界就停止缩放了
+
 ### [ v0.6.1] - 2022-06-03
 
-- 修复bug https://github.com/zuimeiaj/yoyoo-ddr/issues/34
+- 修复 bug https://github.com/zuimeiaj/yoyoo-ddr/issues/34
 
 ### [ v0.6] - 2021-12-12
 
