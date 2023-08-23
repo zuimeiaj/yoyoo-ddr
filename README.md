@@ -23,7 +23,7 @@ npm i yoyoo-ddr-vue3 --save
 ### 安装-react [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-react.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-react)
 
 ```
-npm i yoyoo-ddr-vue3 --save
+npm i yoyoo-ddr-react --save
 ```
 
 ### 单个组件使用 vue
