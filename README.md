@@ -20,7 +20,13 @@ npm i yoyoo-ddr --save
 npm i yoyoo-ddr-vue3 --save
 ```
 
-### 单个组件使用
+### 安装-react [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-react.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-react)
+
+```
+npm i yoyoo-ddr-vue3 --save
+```
+
+### 单个组件使用 vue
 
 [Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
 
@@ -47,6 +53,21 @@ export default {
     );
   },
 };
+```
+
+### React
+
+```tsx
+const [transform, setTransform] = useState({ x: 100, y: 100, width: 100, height: 100, rotation: 0 });
+return (
+  <>
+    <DDR onChange={(_, t) => setTransform(t)} value={transform} parent={true} grid={[10, 10]}>
+      <div style={{ background: 'red', width: '100%', height: '100%' }}>
+        x={transform.x},y={transform.y},w={transform.width},h={transform.height},r={transform.rotation}
+      </div>
+    </DDR>
+  </>
+);
 ```
 
 ### 在数组中使用
