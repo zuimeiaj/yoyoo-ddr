@@ -1,26 +1,29 @@
 ### Install (vue2)
 
 ```
-npm i yoyoo-ddr --save
+npm i yoyoo-ddr-vue2 --save
 ```
 
 ### Install (vue3)
 
 ```
-npm i yoyoo-ddr-vue3 --save
+npm i yoyoo-ddr-vue3-ts --save
 ```
 
-### Usage
+### Install (react)
+
+```
+npm i yoyoo-ddr-react --save
+```
+
+### Usage vue2
 
 Two-way data binding(v-model)
 
 ```js
-import DDR from 'yoyoo-ddr'
-import 'yoyoo-ddr/dist/yoyoo-ddr.css'
+import DDR from 'yoyoo-ddr-vue2'
+import 'yoyoo-ddr-vue2/dist/yoyoo-ddr.css'
 
-// vue 3
-// import DDR from 'yoyoo-ddr-vue3'
-// import 'yoyoo-ddr-vue3/dist/yoyoo-ddr-vue3.css'
 export default {
   data() {
     return {
@@ -28,7 +31,6 @@ export default {
     }
   },
   render() {
-    // vue 3 v-model:value={this.transform}
     return (
       <DDR v-model={this.transform}>
         <div style="background:red;width:100%;height:100%">x={this.transform.x}</div>
@@ -38,96 +40,67 @@ export default {
 }
 ```
 
-### Use arrays to render multiple components
+### Usage vue3
 
-```js
-export default {
-  data() {
-    return {
-      list: [
-        { id: 1, active: false, transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 } },
-        { id: 2, active: false, transform: { x: 200, y: 100, width: 100, height: 100, rotation: 0 } },
-        { id: 3, active: false, transform: { x: 300, y: 100, width: 100, height: 100, rotation: 0 } },
-        { id: 4, active: false, transform: { x: 400, y: 100, width: 100, height: 100, rotation: 0 } },
-      ],
+Two-way data binding(v-model)
+
+```ts
+import DDR from 'yoyoo-ddr-vue3-ts'
+import 'yoyoo-ddr-vue3-ts/dist/style.css'
+import { defineComponent, ref } from 'vue'
+import { TransformProps } from 'yoyoo-ddr-vue3-ts/dist/type'
+
+export default defineComponent({
+  setup() {
+    const t = ref < TransformProps > ({ x: 100, y: 100, width: 100, height: 100, rotation: 0 })
+    return () => {
+      return (
+        <div style={'width:100%;height:100%'}>
+          <DDR
+            axis="x"
+            minHeight={20}
+            minWidth={20}
+            maxWidth={200}
+            maxHeight={200}
+            parent={true}
+            grid={[10, 10]}
+            v-model:value={t.value}
+          >
+            <div style={{ width: '100%', height: '100%', background: 'red' }}>
+              <div>x= {t.value.x}</div>
+              <div>y= {t.value.y}</div>
+              <div>w= {t.value.width}</div>
+              <div>h= {t.value.height}</div>
+            </div>
+          </DDR>
+          <button onClick={() => (t.value.x += 100)}> to right</button>
+        </div>
+      )
     }
   },
-  methods: {
-    // If the `active` property of the component and the return value of the beforeActive function are both false,
-    // the component will not respond to mouse operations
-    handleActive(id) {
-      //  Synchronize the array once when the component is selected
-      this.list = this.list.map((item) => {
-        if (item.id === id) {
-          // Set the currently selected active to true in the array
-          item = { ...item, active: true }
-        } else if (item.active) {
-          // Normally, only one component of the array rendering is active, so here the last selected component is set to the false state
-          item = { ...item, active: false }
-        }
-        return item
-      })
-      return true
-    },
-    // Use the renderContent function instead of slot to ensure that only the modified data is updated when updating `list`.
-    renderChild(item) {
-      return <div style="background:red;width:100%;height:100%">Child {item.id}</div>
-    },
-  },
-  render() {
-    return (
-      <div>
-        {this.list.map((item) => {
-          // If you use slot here, all components will be re-rendered when a new value is set for list. practice shows that performance problems occur when more than 200 components are used, while up to 2000 can be used with renderContent.
-
-          // If you want to customize other properties for the component, you need to wrap the component once. You can refer to examples/vseditor/cell-wrapper.vue in the demo project.
-          return (
-            <DDR
-              beforeActive={this.handleActive}
-              active={item.active}
-              key={item.id}
-              id={item.id}
-              value={item.transform}
-              renderContent={this.renderChild}
-            />
-          )
-        })}
-      </div>
-    )
-  },
-}
+})
 ```
 
-### `value` One-way data binding
+### Usage react
 
-```javascript
-export default {
-  data() {
-    return {
-      transform: { x: 100, y: 100, width: 100, height: 100, rotation: 0 },
-    }
-  },
-  methods: {
-    handleDrag(event, transform) {
-      this.transform = transform
-    },
-    handleResize(event, transform) {
-      this.transform = transform
-    },
-    handleRotate(event, transform) {
-      this.transform = transform
-    },
-  },
-  render() {
-    // When the component is dragged, the `transform` of the parent component will not be updated
-    // You need to listen to the event to synchronize the transform
-    // This example is only the synchronization of a single component. If you use array rendering, it is recommended to use dragend, rotatend, and resizend events to synchronize to avoid performance problems caused by the update frequency too fast
-    return (
-      <DDR onResize={this.handleResize} onRotate={this.handleRotate} onDrag={this.handleDrag} value={this.transform}>
-        <div style="background:red;width:100%;height:100%">child</div>
+```ts
+import DDR from 'yoyoo-ddr-react'
+import 'yoyoo-ddr-react/dist/style.css'
+
+import { useState } from 'react'
+import { TransformProps } from 'yoyoo-ddr-react/dist/type'
+
+function App() {
+  const [transform, setTransform] = useState<TransformProps>({ x: 100, y: 100, width: 100, height: 100, rotation: 0 })
+  return (
+    <>
+      <DDR onChange={(_, t) => setTransform(t)} value={transform} parent={true} grid={[10, 10]}>
+        <div style={{ background: 'red', width: '100%', height: '100%' }}>
+          x={transform.x},y={transform.y},w={transform.width},h={transform.height},r={transform.rotation}
+        </div>
       </DDR>
-    )
-  },
+    </>
+  )
 }
 ```
 
