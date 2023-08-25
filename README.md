@@ -3,21 +3,21 @@
 </p>
 
 <p align='center'>
-Draggable, rotatable and resizable components based on Vue (2 & 3)
+Draggable, rotatable and resizable components 
 </p>
 
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
-### 安装-vue 2 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr)
+### 安装-vue 2 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-vue2.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-vue2)
 
 ```
-npm i yoyoo-ddr --save
+npm i yoyoo-ddr-vue2 --save
 ```
 
-### 安装-vue 3 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-vue3.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-vue3)
+### 安装-vue 3 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-vue3-ts.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-vue3-ts)
 
 ```
-npm i yoyoo-ddr-vue3 --save
+npm i yoyoo-ddr-vue3-ts --save
 ```
 
 ### 安装-react [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-react.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-react)
@@ -31,12 +31,9 @@ npm i yoyoo-ddr-react --save
 [Example](https://zuimeiaj.github.io/ddr/#/twowaybind)
 
 ```javascript
-import DDR from 'yoyoo-ddr';
-import 'yoyoo-ddr/dist/yoyoo-ddr.css';
+import DDR from 'yoyoo-ddr-vue2'
+import 'yoyoo-ddr-vue2/dist/yoyoo-ddr.css'
 
-// vue 3
-// import DDR from 'yoyoo-ddr-vue3'
-// import 'yoyoo-ddr-vue3/dist/yoyoo-ddr-vue3.css'
 
 export default {
   data() {
@@ -45,7 +42,6 @@ export default {
     };
   },
   render() {
-    // vue 3 使用 v-model:value={this.transform}
     return (
       <DDR v-model={this.transform}>
         <div style='background:red;width:100%;height:100%'>x={this.transform.x}</div>
@@ -55,25 +51,6 @@ export default {
 };
 ```
 
-### React
-
-```tsx
-import DDR from 'yoyoo-ddr-react';
-import 'yoyoo-ddr-react/dist/style.css';
-import { TransformProps } from 'yoyoo-ddr-react/dist/type';
-function App() {
-  const [transform, setTransform] = useState<TransformProps>({ x: 100, y: 100, width: 100, height: 100, rotation: 0 });
-  return (
-    <>
-      <DDR onChange={(_, t) => setTransform(t)} value={transform} parent={true} grid={[10, 10]}>
-        <div style={{ background: 'red', width: '100%', height: '100%' }}>
-          x={transform.x},y={transform.y},w={transform.width},h={transform.height},r={transform.rotation}
-        </div>
-      </DDR>
-    </>
-  );
-}
-```
 
 ### 在数组中使用
 
@@ -217,21 +194,6 @@ export default {
 
 - [更新日志](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/CHANGELOG.md)
 
-### Demo 项目目前已实现的功能，且在不停的更新中
-
-- [x] 可以自定义组件，在目录 `src/examples/vseditor/component-impl.js`中增加实现并导出。 components.vue 中添加对应的类型即可。
-- [x] 可自定义组件属性编辑器 在目录 `src/examples/vseditor/prop-inspector.vue` 中添加对应的类型并实现即可
-- [x] 可从组件列表中拖拽组件到编辑区域进行编辑
-- [x] 支持嵌套组件，`component-impl.js` 中的 `Container` 组件实际包含了一个`editor-view`组件，可无限嵌套
-- [x] 编辑器区域的其他功能将以插件的形式提供，方便功能管理
-- [x] 支持历史记录回退，组件删除和画布清除等
-- [x] 支持编辑器区域框选功能，批量拖拽，批量删除 ，批量创建副本
-- [x] 完善编辑器区域的框选功能，已实现组件的批量更新
-- [x] 使用 keyboardjs 来支持快捷键触发操作（command z,command shift z,backspace,command d）
-- [x] 持续重构代码，通常情况都是先实现再做优化。
-- [x] 优化组件付容器缩放问题
-
-> 该项目会一直不停的完善，其目的主要是通过大量的项目实践给 `yoyoo-ddr` 增加一些有用的功能，使他尽可能满足大部分场景的需求。
 
 ### 联系我
 
