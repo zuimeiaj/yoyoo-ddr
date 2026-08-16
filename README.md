@@ -6,7 +6,7 @@
 Draggable, rotatable and resizable components 
 </p>
 
-### [实时协作设计工具+AI生成](https://zuimeiaj.com)
+### [多人实时协作设计+AI生成](https://zuimeiaj.com)工具正式上线了，免费使用
 
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
