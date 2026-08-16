@@ -6,6 +6,8 @@
 Draggable, rotatable and resizable components 
 </p>
 
+### [![实时协作设计工具+AI生成](https://zuimeiaj.com)]
+
 ### [English document](https://github.com/zuimeiaj/yoyoo-ddr/blob/master/ENGLISH-DOC.md)
 
 ### 安装-vue 2 [![NPM Version](https://img.shields.io/npm/v/yoyoo-ddr-vue2.svg?style=flat)](https://www.npmjs.com/package/yoyoo-ddr-vue2)
